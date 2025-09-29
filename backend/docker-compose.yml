@@ -1,0 +1,17 @@
+services:
+    db:
+        container_name: matcha-mysql
+        image: mysql:8.0
+        ports:
+            - 3306:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_DATABASE: matcha_db
+            MYSQL_USER: matcha_user
+            MYSQL_PASSWORD: matcha_password
+        command: --default-authentication-plugin=mysql_native_password
+        volumes:
+            - mysql_data:/var/lib/mysql
+
+volumes:
+    mysql_data:
