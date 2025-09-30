@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ShoppingCart, User, Search, Menu, LogOut } from "lucide-react";
-import { useState } from "react";
+import Cookies from "js-cookie";
+import { ShoppingCart, UserIcon, Search, Menu, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -15,12 +16,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useCart } from "@/hooks/use-cart";
+import { useQuery } from "@tanstack/react-query";
+import { getCurrentUser, logout } from "@/services/auth";
+import { useRouter } from "next/navigation";
 
 export function Header() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { getTotalItems } = useCart();
 
-  const handleLogout = () => {};
+  const { data: user } = useQuery({
+    queryKey: ["user"],
+    queryFn: getCurrentUser,
+    staleTime: Infinity,
+  });
+
+  const handleLogout = async () => {
+    await logout();
+    Cookies.remove("auth_token");
+    router.push("/auth/login");
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -94,12 +109,12 @@ export function Header() {
             </Link>
 
             {/* User Menu */}
-            {0 ? (
+            {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="rounded-2xl">
-                    <User className="h-5 w-5" />
-                    <span className="hidden sm:inline ml-2">Nguyen Van A</span>
+                    <UserIcon className="h-5 w-5" />
+                    <span className="hidden sm:inline ml-2">{user.name}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -122,7 +137,7 @@ export function Header() {
             ) : (
               <Link href="/auth/login">
                 <Button variant="ghost" size="sm" className="rounded-2xl">
-                  <User className="h-5 w-5" />
+                  <UserIcon className="h-5 w-5" />
                   <span className="hidden sm:inline ml-2">Đăng nhập</span>
                 </Button>
               </Link>

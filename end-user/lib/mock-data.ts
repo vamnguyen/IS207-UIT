@@ -152,9 +152,8 @@ export const mockProducts: Product[] = [
 
 export const mockUser: User = {
   id: "1",
-  full_name: "Nguyễn Văn An",
+  name: "Nguyễn Văn An",
   email: "nguyen.van.an@email.com",
-  phone: "0123456789",
   role: "customer",
   created_at: "2024-01-01T00:00:00Z",
 };

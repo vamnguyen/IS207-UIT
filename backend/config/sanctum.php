@@ -47,7 +47,8 @@ return [
     |
     */
 
-    'expiration' => null,
+    'expiration' => null, // <-- Mặc định: không bao giờ hết hạn
+    // 'expiration' => 60, // <-- Hết hạn sau 1 giờ (60 phút)
 
     /*
     |--------------------------------------------------------------------------
