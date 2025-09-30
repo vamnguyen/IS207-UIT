@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { ShoppingCart, UserIcon, Search, Menu, LogOut } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useCart } from "@/hooks/use-cart";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "@/services/auth";
 import { useRouter } from "next/navigation";
 
@@ -24,15 +24,20 @@ export function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { getTotalItems } = useCart();
+  const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
     queryKey: ["user"],
     queryFn: getCurrentUser,
-    staleTime: Infinity,
+    enabled: !!Cookies.get("auth_token"), // Chỉ chạy khi có auth_token
+    staleTime: 60 * 60 * 1000, // 1 giờ
   });
 
   const handleLogout = async () => {
     await logout();
+
+    queryClient.removeQueries({ queryKey: ["user"] });
+
     Cookies.remove("auth_token");
     router.push("/auth/login");
   };
