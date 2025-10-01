@@ -1,28 +1,33 @@
-import { RegisterForm } from "@/components/auth/register-form";
+import type { Metadata } from "next";
+import { LoginForm } from "@/components/auth/login-form";
 import Link from "next/link";
 
-export default function RegisterPage() {
+export const metadata: Metadata = {
+  title: "Đăng nhập tài khoản",
+};
+
+export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto space-y-8">
           <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold text-balance">Đăng ký</h1>
+            <h1 className="text-2xl font-bold text-balance">Đăng nhập</h1>
             <p className="text-muted-foreground text-pretty">
-              Tạo tài khoản để bắt đầu thuê đồ dễ dàng
+              Chào mừng bạn quay trở lại với RentHub
             </p>
           </div>
 
-          <RegisterForm />
+          <LoginForm />
 
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              Đã có tài khoản?{" "}
+              Chưa có tài khoản?{" "}
               <Link
-                href="/auth/login"
+                href="/register"
                 className="text-primary hover:underline font-medium"
               >
-                Đăng nhập ngay
+                Đăng ký ngay
               </Link>
             </p>
           </div>

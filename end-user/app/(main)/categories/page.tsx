@@ -1,7 +1,12 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/card";
 import { mockCategories } from "@/lib/mock-data";
-import { ArrowRight } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Danh mục sản phẩm",
+};
 
 export default function CategoriesPage() {
   return (

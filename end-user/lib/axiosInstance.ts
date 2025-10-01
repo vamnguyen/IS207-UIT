@@ -34,7 +34,7 @@ axiosInstance.interceptors.response.use(
       // Chuyển hướng người dùng về trang đăng nhập
       // Dùng if để chắc chắn code này chỉ chạy trên trình duyệt
       if (typeof window !== "undefined") {
-        window.location.href = "/auth/login";
+        window.location.href = "/login";
       }
     }
 

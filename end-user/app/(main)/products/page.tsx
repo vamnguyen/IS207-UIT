@@ -2,6 +2,11 @@ import { ProductsGrid } from "@/components/products/products-grid";
 import { ProductsFilters } from "@/components/products/products-filters";
 import { ProductsHeader } from "@/components/products/products-header";
 import { mockProducts } from "@/lib/mock-data";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Danh sách sản phẩm",
+};
 
 export default function ProductsPage() {
   return (

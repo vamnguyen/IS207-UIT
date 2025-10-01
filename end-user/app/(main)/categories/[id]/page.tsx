@@ -1,5 +1,6 @@
 import { ProductsGrid } from "@/components/products/products-grid";
 import { mockCategories, mockProducts } from "@/lib/mock-data";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 interface CategoryPageProps {
@@ -8,8 +9,20 @@ interface CategoryPageProps {
   };
 }
 
-export default function CategoryPage({ params }: CategoryPageProps) {
-  const category = mockCategories.find((c) => c.id === params.id);
+export async function generateMetadata({
+  params,
+}: CategoryPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const category = mockCategories.find((c) => c.id === id);
+  return {
+    title: `${category?.category_name}`,
+    description: category?.description || "",
+  };
+}
+
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  const { id } = await params;
+  const category = mockCategories.find((c) => c.id === id);
 
   if (!category) {
     notFound();

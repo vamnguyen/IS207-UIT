@@ -3,7 +3,8 @@ import type { NextRequest } from "next/server";
 
 const publicPaths: string[] = [
   "/",
-  "/auth",
+  "/login",
+  "/register",
   "/cart",
   "/categories",
   "/products",
@@ -20,7 +21,7 @@ export function middleware(request: NextRequest) {
 
   // Nếu không phải public và chưa có token -> redirect về login
   if (!isPublic && !token) {
-    const loginUrl = new URL("/auth/login", request.url);
+    const loginUrl = new URL("/login", request.url);
     return NextResponse.redirect(loginUrl);
   }
 

@@ -20,7 +20,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "@/services/auth";
 import { useRouter } from "next/navigation";
 
-export function Header() {
+export function AppHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { getTotalItems } = useCart();
@@ -30,7 +30,7 @@ export function Header() {
     queryKey: ["user"],
     queryFn: getCurrentUser,
     enabled: !!Cookies.get("auth_token"), // Chỉ chạy khi có auth_token
-    staleTime: 60 * 60 * 1000, // 1 giờ
+    staleTime: Infinity,
   });
 
   const handleLogout = async () => {
@@ -39,7 +39,7 @@ export function Header() {
     queryClient.removeQueries({ queryKey: ["user"] });
 
     Cookies.remove("auth_token");
-    router.push("/auth/login");
+    router.push("/login");
   };
 
   return (
@@ -140,7 +140,7 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link href="/auth/login">
+              <Link href="/login">
                 <Button variant="ghost" size="sm" className="rounded-2xl">
                   <UserIcon className="h-5 w-5" />
                   <span className="hidden sm:inline ml-2">Đăng nhập</span>
