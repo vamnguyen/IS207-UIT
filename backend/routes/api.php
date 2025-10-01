@@ -5,11 +5,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 
-// Public routes
+// ========================== Public routes ==========================
+// 1. Auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+// 2. Category
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/categories/{category}', [CategoryController::class, 'show']);
 
-// Protected routes (yêu cầu xác thực)
+// ========================== Protected routes ==========================
 Route::middleware('auth:sanctum')->group(function () {
     // Route để đăng xuất
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -19,6 +23,10 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    // Route để quản lý category
-    Route::apiResource('categories', CategoryController::class);
+    // Route để admin quản lý category
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/categories', [CategoryController::class, 'store']);
+        Route::put('/categories/{category}', [CategoryController::class, 'update']);
+        Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+    });
 });
