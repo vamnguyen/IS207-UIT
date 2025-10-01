@@ -32,6 +32,7 @@ class CategoryController extends Controller
             'name' => $request->name,
             'slug' => Str::slug($request->name, '-', 'vi'),
             'description' => $request->description,
+            'image_url' => $request->image_url,
         ]);
 
         return response()->json($category, 201);
@@ -53,12 +54,14 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|unique:categories,name,' . $category->id,
             'description' => 'nullable|string',
+            'image_url' => 'nullable|string',
         ]);
 
         $category->update([
             'name' => $request->name,
             'slug' => Str::slug($request->name, '-', 'vi'),
             'description' => $request->description,
+            'image_url' => $request->image_url,
         ]);
 
         return response()->json($category);
