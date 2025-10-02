@@ -1,6 +1,4 @@
-import type { Category, Product, User } from "./types";
-
-export const mockCategories: Category[] = [
+export const mockCategories = [
   {
     id: "1",
     category_name: "Thiết bị điện tử",
@@ -35,7 +33,7 @@ export const mockCategories: Category[] = [
   },
 ];
 
-export const mockProducts: Product[] = [
+export const mockProducts = [
   {
     id: "1",
     product_name: 'MacBook Pro 16" M3',
@@ -150,7 +148,7 @@ export const mockProducts: Product[] = [
   },
 ];
 
-export const mockUser: User = {
+export const mockUser = {
   id: "1",
   name: "Nguyễn Văn An",
   email: "nguyen.van.an@email.com",

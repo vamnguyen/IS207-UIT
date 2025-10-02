@@ -27,7 +27,7 @@ export function useCart() {
     endDate: string
   ) => {
     const days = calculateDays(startDate, endDate);
-    const total_price = product.price_per_day * quantity * days;
+    const total_price = product.price * quantity * days;
 
     const newItem: CartItem = {
       id: generateId(),
@@ -53,7 +53,7 @@ export function useCart() {
           ? {
               ...item,
               quantity,
-              total_price: item.product.price_per_day * quantity * item.days,
+              total_price: item.product.price * quantity * item.days,
             }
           : item
       )

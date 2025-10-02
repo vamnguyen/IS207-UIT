@@ -1,30 +1,36 @@
+import { ProductStatus, Role } from "./enum";
+
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  role: "customer" | "admin" | "owner";
+  role: Role;
   created_at: string;
 }
 
 export interface Category {
-  id: string;
-  category_name: string;
+  id: number;
+  name: string;
+  slug: string;
   description?: string;
   image_url?: string;
   created_at: string;
 }
 
 export interface Product {
-  id: string;
-  product_name: string;
+  id: number;
+  name: string;
+  slug: string;
   description: string;
-  price_per_day: number;
+  price: number;
   stock: number;
-  category_id: string;
-  category?: Category;
   image_url?: string;
   images?: string[];
-  status: "available" | "rented" | "maintenance";
+  status: ProductStatus;
+  category_id: number;
+  category?: Category;
+  shop_id: number;
+  shop?: User;
   created_at: string;
   updated_at: string;
 }
@@ -40,9 +46,9 @@ export interface CartItem {
 }
 
 export interface Rental {
-  id: string;
-  user_id: string;
-  user?: User;
+  id: number;
+  user_id: number;
+  user: User;
   start_date: string;
   end_date: string;
   total_amount: number;
@@ -53,10 +59,10 @@ export interface Rental {
 }
 
 export interface RentalItem {
-  id: string;
-  rental_id: string;
-  product_id: string;
-  product?: Product;
+  id: number;
+  rental_id: number;
+  product_id: number;
+  product: Product;
   quantity: number;
   price_per_day: number;
   days: number;
@@ -64,8 +70,8 @@ export interface RentalItem {
 }
 
 export interface Payment {
-  id: string;
-  rental_id: string;
+  id: number;
+  rental_id: number;
   payment_method: "cash" | "bank_transfer" | "card";
   amount: number;
   status: "pending" | "completed" | "failed";

@@ -1,7 +1,7 @@
-import { mockProducts } from "@/lib/mock-data";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/products/product-detail";
 import type { Metadata } from "next";
+import { getProductById } from "@/services/products";
 
 interface ProductPageProps {
   params: {
@@ -13,7 +13,7 @@ export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
   const { id } = await params;
-  const product = mockProducts.find((p) => p.id === id);
+  const product = await getProductById(id);
 
   if (!product) {
     return {
@@ -22,16 +22,16 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${product.product_name}`,
+    title: `${product.name}`,
     description:
       product.description ||
-      `Thuê ${product.product_name} với giá tốt nhất tại RentHub`,
+      `Thuê ${product.name} với giá tốt nhất tại RentHub`,
   };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
-  const product = mockProducts.find((p) => p.id === id);
+  const product = await getProductById(id);
 
   if (!product) {
     notFound();

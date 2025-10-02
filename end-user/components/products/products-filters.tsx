@@ -5,11 +5,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { mockCategories } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
+import { Category } from "@/lib/types";
 
-export function ProductsFilters() {
+export function ProductsFilters({ categories }: { categories: Category[] }) {
   const [priceRange, setPriceRange] = useState([0, 500000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
@@ -67,7 +67,7 @@ export function ProductsFilters() {
           <CardTitle className="text-lg">Danh mục</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {mockCategories.map((category) => (
+          {categories.map((category) => (
             <div key={category.id} className="flex items-center space-x-2">
               <Checkbox
                 id={`category-${category.id}`}
@@ -80,7 +80,7 @@ export function ProductsFilters() {
                 htmlFor={`category-${category.id}`}
                 className="text-sm font-normal cursor-pointer"
               >
-                {category.category_name}
+                {category.name}
               </Label>
             </div>
           ))}

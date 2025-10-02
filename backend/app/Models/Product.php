@@ -19,6 +19,7 @@ class Product extends Model
         'images',
         'status',
         'category_id',
+        'shop_id',
     ];
 
     protected $casts = [
@@ -30,5 +31,11 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    // Một product thuộc về một shop
+    public function shop()
+    {
+        return $this->belongsTo(User::class);
     }
 }

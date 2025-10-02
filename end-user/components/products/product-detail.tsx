@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { ProductImageGallery } from "./product-image-gallery";
 import { toast } from "sonner";
+import { ProductStatus } from "@/lib/enum";
 
 interface ProductDetailProps {
   product: Product;
@@ -36,7 +37,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   const days = startDate && endDate ? calculateDays(startDate, endDate) : 1;
-  const totalPrice = product.price_per_day * quantity * days;
+  const totalPrice = product.price * quantity * days;
 
   const handleAddToCart = () => {
     if (!startDate || !endDate) {
@@ -74,7 +75,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <div className="flex items-start justify-between">
             <div className="space-y-2">
               <h1 className="text-3xl lg:text-4xl font-bold text-balance">
-                {product.product_name}
+                {product.name}
               </h1>
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-1">
@@ -109,12 +110,14 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <div className="flex items-center space-x-4">
             <Badge
               className={`${
-                product.status === "available"
+                product.status === ProductStatus.IN_STOCK
                   ? "bg-green-500 hover:bg-green-600"
                   : "bg-yellow-500 hover:bg-yellow-600"
               }`}
             >
-              {product.status === "available" ? "Còn hàng" : "Đang thuê"}
+              {product.status === ProductStatus.IN_STOCK
+                ? "Còn hàng"
+                : "Đang thuê"}
             </Badge>
             <span className="text-sm text-muted-foreground">
               Còn lại:{" "}
@@ -128,7 +131,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           {/* Price */}
           <div className="space-y-1">
             <div className="text-3xl font-bold text-primary">
-              {formatCurrency(product.price_per_day)}
+              {formatCurrency(product.price)}
             </div>
             <div className="text-muted-foreground">/ ngày</div>
           </div>
@@ -219,7 +222,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Giá thuê ({days} ngày)</span>
-                    <span>{formatCurrency(product.price_per_day * days)}</span>
+                    <span>{formatCurrency(product.price * days)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Số lượng</span>
@@ -244,7 +247,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             size="lg"
             className="w-full rounded-2xl"
             onClick={handleAddToCart}
-            disabled={product.status !== "available"}
+            disabled={product.status !== ProductStatus.IN_STOCK}
           >
             <ShoppingCart className="mr-2 h-5 w-5" />
             Thêm vào giỏ hàng

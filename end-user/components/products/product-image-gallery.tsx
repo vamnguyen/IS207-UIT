@@ -27,7 +27,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
       <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-muted/50 to-muted/20">
         <img
           src={images[currentImageIndex] || "/file.svg"}
-          alt={product.product_name}
+          alt={product.name}
           className="w-full h-full object-cover"
         />
 
@@ -84,7 +84,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
             >
               <img
                 src={image || "/file.svg"}
-                alt={`${product.product_name} ${index + 1}`}
+                alt={`${product.name} ${index + 1}`}
                 className="w-full h-full object-cover"
               />
             </button>

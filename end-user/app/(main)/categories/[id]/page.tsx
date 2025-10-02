@@ -1,5 +1,6 @@
 import { ProductsGrid } from "@/components/products/products-grid";
-import { mockCategories, mockProducts } from "@/lib/mock-data";
+import { getCategoryById } from "@/services/categories";
+import { getProductsByCategoryId } from "@/services/products";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -13,25 +14,22 @@ export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
   const { id } = await params;
-  const category = mockCategories.find((c) => c.id === id);
+  const category = await getCategoryById(id);
   return {
-    title: `${category?.category_name}`,
+    title: `${category?.name}`,
     description: category?.description || "",
   };
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { id } = await params;
-  const category = mockCategories.find((c) => c.id === id);
+  const category = await getCategoryById(id);
 
   if (!category) {
     notFound();
   }
 
-  // Filter products by category
-  const categoryProducts = mockProducts.filter(
-    (p) => p.category_id === category.id
-  );
+  const categoryProducts = await getProductsByCategoryId(id);
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,7 +37,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         <div className="space-y-6 mb-8">
           <div className="space-y-2">
             <h1 className="text-3xl lg:text-4xl font-bold text-balance">
-              {category.category_name}
+              {category.name}
             </h1>
             <p className="text-lg text-muted-foreground text-pretty">
               {category.description}

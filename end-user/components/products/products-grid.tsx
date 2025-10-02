@@ -4,23 +4,19 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { mockProducts } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils";
 import { Star, Heart, ShoppingCart } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Product } from "@/lib/types";
+import { ProductStatus } from "@/lib/enum";
 
-export function ProductsGrid({
-  products = mockProducts,
-}: {
-  products: Product[];
-}) {
+export function ProductsGrid({ products }: { products: Product[] }) {
   const { addToCart } = useCart();
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<number[]>([]);
 
-  const toggleFavorite = (productId: string) => {
+  const toggleFavorite = (productId: number) => {
     setFavorites((prev) =>
       prev.includes(productId)
         ? prev.filter((id) => id !== productId)
@@ -57,7 +53,7 @@ export function ProductsGrid({
                 <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-muted/50 to-muted/20">
                   <img
                     src={product.image_url || "/file.svg"}
-                    alt={product.product_name}
+                    alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
@@ -66,12 +62,14 @@ export function ProductsGrid({
               {/* Status Badge */}
               <Badge
                 className={`absolute top-3 left-3 ${
-                  product.status === "available"
+                  product.status === ProductStatus.IN_STOCK
                     ? "bg-green-500 hover:bg-green-600"
                     : "bg-yellow-500 hover:bg-yellow-600"
                 }`}
               >
-                {product.status === "available" ? "Còn hàng" : "Đang thuê"}
+                {product.status === ProductStatus.IN_STOCK
+                  ? "Còn hàng"
+                  : "Đang thuê"}
               </Badge>
 
               {/* Favorite Button */}
@@ -95,7 +93,7 @@ export function ProductsGrid({
               <div className="space-y-3">
                 <Link href={`/products/${product.id}`}>
                   <h3 className="font-semibold text-lg group-hover:text-primary transition-colors text-balance line-clamp-2">
-                    {product.product_name}
+                    {product.name}
                   </h3>
                 </Link>
 
@@ -128,7 +126,7 @@ export function ProductsGrid({
                 <div className="flex items-center justify-between pt-2">
                   <div>
                     <div className="text-2xl font-bold text-primary">
-                      {formatCurrency(product.price_per_day)}
+                      {formatCurrency(product.price)}
                     </div>
                     <div className="text-sm text-muted-foreground">/ ngày</div>
                   </div>
@@ -139,7 +137,7 @@ export function ProductsGrid({
                       variant="outline"
                       className="rounded-2xl bg-transparent"
                       onClick={() => handleQuickRent(product)}
-                      disabled={product.status !== "available"}
+                      disabled={product.status !== ProductStatus.IN_STOCK}
                     >
                       <ShoppingCart className="h-4 w-4" />
                     </Button>

@@ -2,13 +2,14 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { mockProducts } from "@/lib/mock-data";
-import { formatCurrency } from "@/lib/utils";
-import { Star, Heart } from "lucide-react";
 
-export function FeaturedProducts() {
+import { formatCurrency } from "@/lib/utils";
+import { Star } from "lucide-react";
+import { Product } from "@/lib/types";
+
+export function FeaturedProducts({ products }: { products: Product[] }) {
   // Get first 6 products as featured
-  const featuredProducts = mockProducts.slice(0, 6);
+  const featuredProducts = products.slice(0, 6);
 
   return (
     <section className="py-20">
@@ -40,7 +41,7 @@ export function FeaturedProducts() {
                 <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-muted/50 to-muted/20">
                   <img
                     src={product.image_url}
-                    alt={product.product_name}
+                    alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
@@ -55,7 +56,7 @@ export function FeaturedProducts() {
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
                     <h3 className="font-semibold text-lg group-hover:text-primary transition-colors text-balance">
-                      {product.product_name}
+                      {product.name}
                     </h3>
                   </div>
 
@@ -79,7 +80,7 @@ export function FeaturedProducts() {
                   <div className="flex items-center justify-between pt-2">
                     <div>
                       <div className="text-2xl font-bold text-primary">
-                        {formatCurrency(product.price_per_day)}
+                        {formatCurrency(product.price)}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         / ngày
