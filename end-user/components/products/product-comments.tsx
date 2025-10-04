@@ -6,7 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SendHorizontal, MessageCircle } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  SendHorizontal,
+  MessageCircle,
+  MoreVertical,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import type { Comment } from "@/lib/types";
@@ -14,7 +26,7 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser } from "@/services/auth";
 import Cookies from "js-cookie";
-import { getComments, createComment } from "@/services/comments";
+import { getComments, createComment, deleteComment } from "@/services/comments";
 import { getInitials } from "@/lib/utils";
 
 interface ProductCommentsProps {
@@ -28,8 +40,11 @@ interface CommentItemProps {
   replies: Comment[];
   parentName?: string;
   onReply: (parentCommentId: number, name: string) => void;
+  onEdit: (commentId: number, currentContent: string) => void;
+  onDelete: (commentId: number) => void;
   commentMap: Map<number, Comment[]>;
   depth: number;
+  currentUserId?: number;
 }
 
 function CommentItem({
@@ -37,8 +52,11 @@ function CommentItem({
   replies,
   parentName,
   onReply,
+  onEdit,
+  onDelete,
   commentMap,
   depth,
+  currentUserId,
 }: CommentItemProps) {
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -63,18 +81,50 @@ function CommentItem({
 
         <div className="flex-1 min-w-0">
           <div className="bg-muted/50 p-3 rounded-2xl">
-            <div className="flex items-center gap-2 mb-1">
-              <span
-                className={`font-semibold text-sm ${getRoleColor(
-                  comment.user.role
-                )}`}
-              >
-                {comment.user.name}
-              </span>
-              {comment.user.role === "admin" && (
-                <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
-                  Admin
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`font-semibold text-sm ${getRoleColor(
+                    comment.user.role
+                  )}`}
+                >
+                  {comment.user.name}
                 </span>
+                {comment.user.role === "admin" && (
+                  <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                    Admin
+                  </span>
+                )}
+              </div>
+
+              {/* Dropdown menu for comment owner */}
+              {currentUserId === comment.user_id && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 hover:bg-muted"
+                    >
+                      <MoreVertical className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => onEdit(comment.id, comment.content)}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onDelete(comment.id)}
+                      variant="destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Xóa
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
             <p className="text-sm text-foreground break-words">
@@ -114,8 +164,11 @@ function CommentItem({
               replies={commentMap.get(reply.id) || []}
               parentName={comment.user.name}
               onReply={onReply}
+              onEdit={onEdit}
+              onDelete={onDelete}
               commentMap={commentMap}
               depth={depth + 1}
+              currentUserId={currentUserId}
             />
           ))}
         </div>
@@ -131,8 +184,11 @@ function CommentItem({
               replies={commentMap.get(reply.id) || []}
               parentName={comment.user.name}
               onReply={onReply}
+              onEdit={onEdit}
+              onDelete={onDelete}
               commentMap={commentMap}
               depth={depth + 1}
+              currentUserId={currentUserId}
             />
           ))}
         </div>
@@ -170,6 +226,20 @@ export function ProductComments({ productId }: ProductCommentsProps) {
     onError: (error: any) => {
       console.error("Error creating comment:", error);
       toast.error("Có lỗi xảy ra khi thêm bình luận");
+    },
+  });
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: (commentId: number) => deleteComment(commentId, productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["productComments", productId],
+      });
+      toast.success("Đã xóa bình luận thành công");
+    },
+    onError: (error: any) => {
+      console.error("Error deleting comment:", error);
+      toast.error("Có lỗi xảy ra khi xóa bình luận");
     },
   });
 
@@ -212,6 +282,11 @@ export function ProductComments({ productId }: ProductCommentsProps) {
     setReplyToName(name);
     setNewComment("");
     inputRef.current?.focus();
+  };
+
+  const handleEditComment = (commentId: number, currentContent: string) => {
+    // TODO: Implement edit functionality
+    toast.info("Tính năng chỉnh sửa đang được phát triển");
   };
 
   // Organize comments with parent-child relationships
@@ -337,8 +412,11 @@ export function ProductComments({ productId }: ProductCommentsProps) {
                 comment={comment}
                 replies={commentMap.get(comment.id) || []}
                 onReply={handleReplyClick}
+                onEdit={handleEditComment}
+                onDelete={deleteCommentMutation.mutate}
                 commentMap={commentMap}
                 depth={1}
+                currentUserId={user?.id}
               />
             ))
           )}
