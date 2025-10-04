@@ -77,3 +77,17 @@ export interface Payment {
   status: "pending" | "completed" | "failed";
   created_at: string;
 }
+
+export interface Comment {
+  id: number;
+  content: string;
+  user_id: number;
+  product_id: number;
+  left: number;
+  right: number;
+  parent_id: number | null;
+  created_at: string;
+  updated_at: string;
+  user: User;
+  parent: Comment | null;
+}

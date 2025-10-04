@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/products/product-detail";
+import { ProductComments } from "@/components/products/product-comments";
 import type { Metadata } from "next";
 import { getProductById } from "@/services/products";
 
@@ -41,6 +42,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <ProductDetail product={product} />
+        <ProductComments productId={product.id} />
       </div>
     </div>
   );

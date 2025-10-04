@@ -23,3 +23,23 @@ export type LoginResponse = {
     updated_at: string;
   };
 };
+
+export type GetCommentsResponse = {
+  data: Comment[];
+  total_data: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+};
+
+export type CreateCommentResponse = {
+  content: string;
+  user_id: number;
+  product_id: number;
+  parent_id: number | null;
+  left: number;
+  right: number;
+  updated_at: string;
+  created_at: string;
+  id: number;
+};

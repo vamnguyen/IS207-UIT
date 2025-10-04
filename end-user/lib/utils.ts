@@ -31,3 +31,12 @@ export function calculateDays(startDate: string, endDate: string): number {
 export function generateId(): string {
   return Math.random().toString(36).substr(2, 9);
 }
+
+export function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
