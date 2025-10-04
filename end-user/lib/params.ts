@@ -22,3 +22,8 @@ export type createCommentParams = {
   content: string;
   parent_id?: number | null;
 };
+
+export type updateCommentParams = {
+  content: string;
+  product_id: number;
+};

@@ -26,7 +26,12 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser } from "@/services/auth";
 import Cookies from "js-cookie";
-import { getComments, createComment, deleteComment } from "@/services/comments";
+import {
+  getComments,
+  createComment,
+  updateComment,
+  deleteComment,
+} from "@/services/comments";
 import { getInitials } from "@/lib/utils";
 
 interface ProductCommentsProps {
@@ -45,6 +50,11 @@ interface CommentItemProps {
   commentMap: Map<number, Comment[]>;
   depth: number;
   currentUserId?: number;
+  editingCommentId?: number | null;
+  editingContent?: string;
+  onEditContentChange?: (content: string) => void;
+  onSaveEdit?: (commentId: number) => void;
+  onCancelEdit?: () => void;
 }
 
 function CommentItem({
@@ -57,6 +67,11 @@ function CommentItem({
   commentMap,
   depth,
   currentUserId,
+  editingCommentId,
+  editingContent,
+  onEditContentChange,
+  onSaveEdit,
+  onCancelEdit,
 }: CommentItemProps) {
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -127,14 +142,46 @@ function CommentItem({
                 </DropdownMenu>
               )}
             </div>
-            <p className="text-sm text-foreground break-words">
-              {parentName && (
-                <span className="text-primary underline font-medium underline-offset-2 mr-2">
-                  @{parentName}
-                </span>
-              )}
-              {comment.content}
-            </p>
+            {editingCommentId === comment.id ? (
+              <div className="space-y-2">
+                <Input
+                  value={editingContent || ""}
+                  onChange={(e) => onEditContentChange?.(e.target.value)}
+                  placeholder="Chỉnh sửa bình luận..."
+                  className="text-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      onSaveEdit?.(comment.id);
+                    }
+                    if (e.key === "Escape") {
+                      onCancelEdit?.();
+                    }
+                  }}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => onSaveEdit?.(comment.id)}
+                    disabled={!editingContent?.trim()}
+                  >
+                    Lưu
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={onCancelEdit}>
+                    Hủy
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-foreground break-words">
+                {parentName && (
+                  <span className="text-primary underline font-medium underline-offset-2 mr-2">
+                    @{parentName}
+                  </span>
+                )}
+                {comment.content}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
@@ -144,6 +191,21 @@ function CommentItem({
                 locale: vi,
               })}
             </span>
+            {comment.edited && (
+              <span className="text-muted-foreground italic">
+                (đã chỉnh sửa
+                {comment.edited_at && (
+                  <span>
+                    {" "}
+                    {formatDistanceToNow(new Date(comment.edited_at), {
+                      addSuffix: true,
+                      locale: vi,
+                    })}
+                  </span>
+                )}
+                )
+              </span>
+            )}
             <button
               className="text-primary hover:underline font-medium"
               onClick={() => onReply(comment.id, comment.user.name)}
@@ -169,6 +231,11 @@ function CommentItem({
               commentMap={commentMap}
               depth={depth + 1}
               currentUserId={currentUserId}
+              editingCommentId={editingCommentId}
+              editingContent={editingContent}
+              onEditContentChange={onEditContentChange}
+              onSaveEdit={onSaveEdit}
+              onCancelEdit={onCancelEdit}
             />
           ))}
         </div>
@@ -189,6 +256,11 @@ function CommentItem({
               commentMap={commentMap}
               depth={depth + 1}
               currentUserId={currentUserId}
+              editingCommentId={editingCommentId}
+              editingContent={editingContent}
+              onEditContentChange={onEditContentChange}
+              onSaveEdit={onSaveEdit}
+              onCancelEdit={onCancelEdit}
             />
           ))}
         </div>
@@ -229,6 +301,26 @@ export function ProductComments({ productId }: ProductCommentsProps) {
     },
   });
 
+  const updateCommentMutation = useMutation({
+    mutationFn: ({
+      commentId,
+      content,
+    }: {
+      commentId: number;
+      content: string;
+    }) => updateComment(commentId, { content, product_id: productId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["productComments", productId],
+      });
+      toast.success("Đã cập nhật bình luận thành công");
+    },
+    onError: (error: any) => {
+      console.error("Error updating comment:", error);
+      toast.error("Có lỗi xảy ra khi cập nhật bình luận");
+    },
+  });
+
   const deleteCommentMutation = useMutation({
     mutationFn: (commentId: number) => deleteComment(commentId, productId),
     onSuccess: () => {
@@ -246,6 +338,8 @@ export function ProductComments({ productId }: ProductCommentsProps) {
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<number | null>(null);
   const [replyToName, setReplyToName] = useState<string>("");
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editingContent, setEditingContent] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleAddComment = () => {
@@ -285,8 +379,28 @@ export function ProductComments({ productId }: ProductCommentsProps) {
   };
 
   const handleEditComment = (commentId: number, currentContent: string) => {
-    // TODO: Implement edit functionality
-    toast.info("Tính năng chỉnh sửa đang được phát triển");
+    setEditingCommentId(commentId);
+    setEditingContent(currentContent);
+  };
+
+  const handleSaveEdit = (commentId: number) => {
+    if (!editingContent.trim()) {
+      toast.error("Vui lòng nhập nội dung bình luận");
+      return;
+    }
+
+    updateCommentMutation.mutate({
+      commentId,
+      content: editingContent.trim(),
+    });
+
+    setEditingCommentId(null);
+    setEditingContent("");
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditingContent("");
   };
 
   // Organize comments with parent-child relationships
@@ -417,6 +531,11 @@ export function ProductComments({ productId }: ProductCommentsProps) {
                 commentMap={commentMap}
                 depth={1}
                 currentUserId={user?.id}
+                editingCommentId={editingCommentId}
+                editingContent={editingContent}
+                onEditContentChange={setEditingContent}
+                onSaveEdit={handleSaveEdit}
+                onCancelEdit={handleCancelEdit}
               />
             ))
           )}

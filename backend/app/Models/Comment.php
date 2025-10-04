@@ -16,6 +16,13 @@ class Comment extends Model
         'parent_id',
         'left',
         'right',
+        'edited',
+        'edited_at',
+    ];
+
+    protected $casts = [
+        'edited' => 'boolean',
+        'edited_at' => 'datetime',
     ];
 
     /**

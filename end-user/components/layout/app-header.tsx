@@ -59,12 +59,6 @@ export function AppHeader() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <Link
-              href="/"
-              className="text-sm font-medium hover:text-primary transition-colors"
-            >
-              Trang chủ
-            </Link>
-            <Link
               href="/products"
               className="text-sm font-medium hover:text-primary transition-colors"
             >
@@ -164,12 +158,6 @@ export function AppHeader() {
         {isMenuOpen && (
           <div className="md:hidden border-t py-4">
             <nav className="flex flex-col space-y-4">
-              <Link
-                href="/"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
-                Trang chủ
-              </Link>
               <Link
                 href="/products"
                 className="text-sm font-medium hover:text-primary transition-colors"

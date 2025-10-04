@@ -1,5 +1,9 @@
 import axiosInstance from "@/lib/axiosInstance";
-import { getCommentsParams, createCommentParams } from "@/lib/params";
+import {
+  getCommentsParams,
+  createCommentParams,
+  updateCommentParams,
+} from "@/lib/params";
 import { GetCommentsResponse, CreateCommentResponse } from "@/lib/response";
 
 export const getComments = async (
@@ -19,6 +23,14 @@ export const createComment = async (
 ): Promise<CreateCommentResponse> => {
   const response = await axiosInstance.post(
     `${process.env.NEXT_PUBLIC_API_URL}/comments`,
+    data
+  );
+  return response.data;
+};
+
+export const updateComment = async (id: number, data: updateCommentParams) => {
+  const response = await axiosInstance.put(
+    `${process.env.NEXT_PUBLIC_API_URL}/comments/${id}`,
     data
   );
   return response.data;

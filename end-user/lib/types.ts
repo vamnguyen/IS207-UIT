@@ -86,6 +86,8 @@ export interface Comment {
   left: number;
   right: number;
   parent_id: number | null;
+  edited: boolean;
+  edited_at: string | null;
   created_at: string;
   updated_at: string;
   user: User;

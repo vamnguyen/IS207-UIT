@@ -119,6 +119,33 @@ class CommentController extends Controller
     }
 
     /**
+     * Cập nhật comment
+     */
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'content' => 'required|string',
+            'product_id' => 'required|integer|exists:products,id',
+        ]);
+
+        $productId = $validated['product_id'];
+        $userId = $request->user()->id;
+        $content = $validated['content'];
+
+        $comment = Comment::where('id', $id)
+            ->where('product_id', $productId)
+            ->where('user_id', $userId)
+            ->firstOrFail();
+
+        $comment->content = $content;
+        $comment->edited = true;
+        $comment->edited_at = now();
+        $comment->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Xoá comment và toàn bộ con của nó
      */
     public function destroy(Request $request, $id)
