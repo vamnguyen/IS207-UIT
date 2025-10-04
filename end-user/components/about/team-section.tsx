@@ -167,7 +167,7 @@ export function TeamSection() {
                       <Button
                         size="icon"
                         variant="secondary"
-                        className="rounded-full h-10 w-10 bg-white/90 hover:bg-white"
+                        className="rounded-full h-10 w-10 bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black"
                         asChild
                       >
                         <a
@@ -181,7 +181,7 @@ export function TeamSection() {
                       <Button
                         size="icon"
                         variant="secondary"
-                        className="rounded-full h-10 w-10 bg-white/90 hover:bg-white"
+                        className="rounded-full h-10 w-10 bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black"
                         asChild
                       >
                         <a
@@ -195,7 +195,7 @@ export function TeamSection() {
                       <Button
                         size="icon"
                         variant="secondary"
-                        className="rounded-full h-10 w-10 bg-white/90 hover:bg-white"
+                        className="rounded-full h-10 w-10 bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black"
                         asChild
                       >
                         <a href={`mailto:${member.social.email}`}>
