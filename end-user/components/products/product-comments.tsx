@@ -11,10 +11,10 @@ import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import type { Comment } from "@/lib/types";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser } from "@/services/auth";
 import Cookies from "js-cookie";
-import { getComments } from "@/services/comments";
+import { getComments, createComment } from "@/services/comments";
 import { getInitials } from "@/lib/utils";
 
 interface ProductCommentsProps {
@@ -79,7 +79,9 @@ function CommentItem({
             </div>
             <p className="text-sm text-foreground break-words">
               {parentName && (
-                <span className="text-primary font-medium">@{parentName} </span>
+                <span className="text-primary underline font-medium underline-offset-2 mr-2">
+                  @{parentName}
+                </span>
               )}
               {comment.content}
             </p>
@@ -140,20 +142,40 @@ function CommentItem({
 }
 
 export function ProductComments({ productId }: ProductCommentsProps) {
+  const queryClient = useQueryClient();
+
   const { data: user } = useQuery({
     queryKey: ["user"],
     queryFn: getCurrentUser,
     enabled: !!Cookies.get("auth_token"),
     staleTime: Infinity,
   });
+
   const { data: productComments } = useQuery({
     queryKey: ["productComments", productId],
     queryFn: () => getComments({ product_id: productId }),
     enabled: !!productId,
     staleTime: 1 * 60 * 60 * 1000, // 1 giờ
   });
+
+  const createCommentMutation = useMutation({
+    mutationFn: createComment,
+    onSuccess: () => {
+      // Invalidate and refetch comments
+      queryClient.invalidateQueries({
+        queryKey: ["productComments", productId],
+      });
+      toast.success("Đã thêm bình luận thành công");
+    },
+    onError: (error: any) => {
+      console.error("Error creating comment:", error);
+      toast.error("Có lỗi xảy ra khi thêm bình luận");
+    },
+  });
+
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<number | null>(null);
+  const [replyToName, setReplyToName] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleAddComment = () => {
@@ -167,10 +189,17 @@ export function ProductComments({ productId }: ProductCommentsProps) {
       return;
     }
 
-    // In a real app, this would call an API
-    toast.success("Đã thêm bình luận");
+    // Create comment with mutation
+    createCommentMutation.mutate({
+      product_id: productId,
+      content: newComment.trim(),
+      parent_id: replyTo,
+    });
+
+    // Reset form
     setNewComment("");
     setReplyTo(null);
+    setReplyToName("");
   };
 
   const handleReplyClick = (parentCommentId: number, name: string) => {
@@ -180,7 +209,8 @@ export function ProductComments({ productId }: ProductCommentsProps) {
     }
 
     setReplyTo(parentCommentId);
-    setNewComment(`@${name} `);
+    setReplyToName(name);
+    setNewComment("");
     inputRef.current?.focus();
   };
 
@@ -230,19 +260,39 @@ export function ProductComments({ productId }: ProductCommentsProps) {
           </Avatar>
 
           <div className="flex-1 space-y-2">
+            {replyToName && (
+              <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg">
+                <span>Đang trả lời</span>
+                <span className="font-medium">@{replyToName}</span>
+                <button
+                  onClick={() => {
+                    setReplyTo(null);
+                    setReplyToName("");
+                  }}
+                  className="ml-auto text-muted-foreground hover:text-foreground"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
             <Input
               ref={inputRef}
               placeholder={
-                user ? "Viết bình luận của bạn..." : "Đăng nhập để bình luận"
+                replyToName
+                  ? `Trả lời ${replyToName}...`
+                  : user
+                  ? "Viết bình luận của bạn..."
+                  : "Đăng nhập để bình luận"
               }
               value={newComment}
               onChange={(e) => {
                 const value = e.target.value;
                 setNewComment(value);
 
-                // Reset replyTo if user removes the @mention
-                if (!/^@\w+\s/.test(value)) {
+                // Reset replyTo if user clears the input
+                if (!value.trim()) {
                   setReplyTo(null);
+                  setReplyToName("");
                 }
               }}
               onKeyDown={(e) => {
@@ -260,10 +310,12 @@ export function ProductComments({ productId }: ProductCommentsProps) {
                 size="sm"
                 className="rounded-2xl"
                 onClick={handleAddComment}
-                disabled={!user || !newComment.trim()}
+                disabled={
+                  !user || !newComment.trim() || createCommentMutation.isPending
+                }
               >
                 <SendHorizontal className="h-4 w-4 mr-2" />
-                Gửi
+                {createCommentMutation.isPending ? "Đang gửi..." : "Gửi"}
               </Button>
             </div>
           </div>
