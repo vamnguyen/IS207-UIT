@@ -4,8 +4,6 @@ import type { NextRequest } from "next/server";
 const publicPaths: string[] = [
   "/",
   "/login",
-  "/register",
-  "/cart",
   "/categories",
   "/products",
   "/about",
