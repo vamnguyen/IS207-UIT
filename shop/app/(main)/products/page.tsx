@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 
 export default async function ProductsPage() {
   const categories = await getCategories();
-  const products = await getProducts();
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,7 +23,7 @@ export default async function ProductsPage() {
           </div>
 
           <div className="lg:col-span-3">
-            <ProductsGrid products={products} />
+            <ProductsGrid />
           </div>
         </div>
       </div>

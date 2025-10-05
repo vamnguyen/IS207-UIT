@@ -18,7 +18,7 @@ export default async function Home() {
     <main className="min-h-screen">
       <HeroSection />
       <CategoriesGrid categories={categories} />
-      <FeaturedProducts products={products} />
+      <FeaturedProducts products={products.data} />
       <StatsSection />
     </main>
   );

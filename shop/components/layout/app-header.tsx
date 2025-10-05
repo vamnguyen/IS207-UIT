@@ -18,6 +18,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "@/services/auth";
 import { useRouter } from "next/navigation";
 
+const navItems = [
+  {
+    label: "Sản phẩm của tôi",
+    href: "/my-products",
+  },
+];
+
 export function AppHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -55,24 +62,15 @@ export function AppHeader() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link
-              href="/products"
-              className="text-sm font-medium hover:text-primary transition-colors"
-            >
-              Sản phẩm
-            </Link>
-            <Link
-              href="/categories"
-              className="text-sm font-medium hover:text-primary transition-colors"
-            >
-              Danh mục
-            </Link>
-            <Link
-              href="/about"
-              className="text-sm font-medium hover:text-primary transition-colors"
-            >
-              Giới thiệu
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm font-medium hover:text-primary transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Search Bar - Desktop */}
@@ -102,9 +100,6 @@ export function AppHeader() {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuItem asChild>
                     <Link href="/profile">Thông tin cá nhân</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/orders">Đơn hàng của tôi</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -141,24 +136,15 @@ export function AppHeader() {
         {isMenuOpen && (
           <div className="md:hidden border-t py-4">
             <nav className="flex flex-col space-y-4">
-              <Link
-                href="/products"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
-                Sản phẩm
-              </Link>
-              <Link
-                href="/categories"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
-                Danh mục
-              </Link>
-              <Link
-                href="/about"
-                className="text-sm font-medium hover:text-primary transition-colors"
-              >
-                Giới thiệu
-              </Link>
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm font-medium hover:text-primary transition-colors"
+                >
+                  {item.label}
+                </Link>
+              ))}
               {/* Mobile Search */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />

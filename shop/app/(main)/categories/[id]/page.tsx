@@ -1,3 +1,4 @@
+import CategoryProducts from "@/components/categories/category-products";
 import { ProductsGrid } from "@/components/products/products-grid";
 import { getCategoryById } from "@/services/categories";
 import { getProductsByCategoryId } from "@/services/products";
@@ -47,14 +48,16 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
               Hiển thị{" "}
-              <span className="font-medium">{categoryProducts.length}</span> sản
-              phẩm
+              <span className="font-medium">
+                {categoryProducts.data.length}
+              </span>{" "}
+              sản phẩm
             </p>
           </div>
         </div>
 
-        {categoryProducts.length > 0 ? (
-          <ProductsGrid products={categoryProducts} />
+        {categoryProducts.data.length > 0 ? (
+          <CategoryProducts categoryId={id} />
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground">

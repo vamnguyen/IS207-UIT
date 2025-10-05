@@ -9,16 +9,20 @@ import { Star, Heart } from "lucide-react";
 import { useState } from "react";
 import { ProductStatus } from "@/lib/enum";
 import { useQuery } from "@tanstack/react-query";
-import { getProducts } from "@/services/products";
+import { getProductsByCategoryId } from "@/services/products";
 import PaginationControl from "@/components/pagination-control";
 
-export function ProductsGrid() {
+export default function CategoryProducts({
+  categoryId,
+}: {
+  categoryId: string;
+}) {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [page, setPage] = useState(1);
 
   const { data: paginated, isLoading } = useQuery({
-    queryKey: ["products", page],
-    queryFn: () => getProducts(page, 6),
+    queryKey: ["categoryProducts", categoryId, page],
+    queryFn: () => getProductsByCategoryId(categoryId, page, 6),
     staleTime: Infinity,
   });
 

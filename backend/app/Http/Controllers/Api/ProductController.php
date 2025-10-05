@@ -13,9 +13,15 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category', 'shop'])->paginate(10);
+        $perPage = (int) ($request->query('per_page', 10));
+        // Ensure perPage is within reasonable bounds
+        $perPage = max(1, min(100, $perPage));
+
+        $products = Product::with(['category', 'shop'])
+            ->paginate($perPage);
+
         return response()->json($products);
     }
 
@@ -81,9 +87,25 @@ class ProductController extends Controller
     public function getByCategoryId(Request $request, int $categoryId)
     {
         $perPage = (int) ($request->query('per_page', 10));
+        $perPage = max(1, min(100, $perPage));
 
         $products = Product::with(['category', 'shop'])
             ->where('category_id', $categoryId)
+            ->paginate($perPage);
+
+        return response()->json($products);
+    }
+
+    /**
+     * Lấy danh sách sản phẩm theo shop id
+     */
+    public function getByShopId(Request $request, int $shopId)
+    {
+        $perPage = (int) ($request->query('per_page', 10));
+        $perPage = max(1, min(100, $perPage));
+
+        $products = Product::with(['category', 'shop'])
+            ->where('shop_id', $shopId)
             ->paginate($perPage);
 
         return response()->json($products);
