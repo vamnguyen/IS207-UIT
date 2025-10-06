@@ -9,3 +9,8 @@ export enum Role {
   SHOP = "shop",
   ADMIN = "admin",
 }
+
+export enum UploadFolder {
+  PRODUCT_IMAGES = "product-images",
+  CATEGORY_IMAGES = "category-images",
+}

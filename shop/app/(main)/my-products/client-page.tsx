@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { getCurrentUser } from "@/services/auth";
@@ -30,13 +30,31 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Product } from "@/lib/types";
 import { useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import { getCategories } from "@/services/categories";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectGroup,
+} from "@/components/ui/select";
+import { useDropzone } from "react-dropzone";
+import { uploadFiles } from "@/services/uploads";
 import PaginationControl from "@/components/pagination-control";
+import { toast } from "sonner";
+import { UploadFolder } from "@/lib/enum";
+import { Loader2, X } from "lucide-react";
 
 export default function ClientMyProductsPage() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<Product | null>(null);
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [attachments, setAttachments] = useState<string[]>([]);
+  const [loadingAttachments, setLoadingAttachments] = useState(false);
 
   const { data: user } = useQuery<{ id: number } | null>({
     queryKey: ["user"],
@@ -49,7 +67,7 @@ export default function ClientMyProductsPage() {
 
   const { data: paginated, isLoading } = useQuery({
     queryKey: ["products", shopId, page],
-    queryFn: () => getProductsByShopId(shopId, page, 3),
+    queryFn: () => getProductsByShopId(shopId, page, 10),
     enabled: !!shopId,
     staleTime: Infinity,
   });
@@ -58,41 +76,110 @@ export default function ClientMyProductsPage() {
 
   const createMut = useMutation({
     mutationFn: (data: Partial<Product>) => createProduct(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["products", shopId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["products", shopId] });
+      toast.success("Tạo sản phẩm thành công");
+    },
   });
 
   const updateMut = useMutation({
     mutationFn: (payload: { id: number; data: Partial<Product> }) =>
       updateProduct(payload.id, payload.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["products", shopId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["products", shopId] });
+      toast.success("Cập nhật sản phẩm thành công");
+    },
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: number) => deleteProduct(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["products", shopId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["products", shopId] });
+      toast.success("Xoá sản phẩm thành công");
+    },
   });
 
   const methods = useForm<Partial<Product>>({
     defaultValues: {},
   });
 
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+    staleTime: Infinity,
+  });
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    maxSize: 5 * 1024 * 1024, // 5MB
+    multiple: true,
+    onDrop: async (acceptedFiles: File[]) => {
+      setLoadingAttachments(true);
+
+      try {
+        const urls = await uploadFiles(
+          acceptedFiles,
+          UploadFolder.PRODUCT_IMAGES
+        );
+        if (urls && urls.length > 0) {
+          setAttachments((prev) => [...prev, ...urls]);
+        }
+      } catch (err) {
+        toast.error("Tải ảnh lên thất bại");
+      } finally {
+        setLoadingAttachments(false);
+      }
+    },
+    onDropRejected: (fileRejections) => {
+      const errors = fileRejections.map(({ file, errors }) => {
+        return `${file.name} - ${errors.map((e) => e.message).join(", ")}`;
+      });
+      toast.error(`File upload failed: ${errors.join(", ")}`);
+    },
+  });
+
   const openCreate = () => {
     setEditing(null);
-    methods.reset();
+    methods.reset({});
+    setAttachments([]);
     setOpen(true);
   };
 
   const openEdit = (p: Product) => {
     setEditing(p);
     methods.reset(p);
+    setAttachments(p.images || []);
     setOpen(true);
   };
 
+  // Ensure when dialog opens we set the proper form values (create vs edit)
+  useEffect(() => {
+    if (open) {
+      if (editing) {
+        methods.reset(editing);
+        setAttachments(editing.images || []);
+      } else {
+        methods.reset({});
+        setAttachments([]);
+      }
+    }
+    // when dialog closes we keep editing cleared so subsequent opens start fresh
+    if (!open) {
+      setEditing(null);
+    }
+    // only run when open or editing changes
+  }, [open, editing]);
+
   const onSubmit = (values: Partial<Product>) => {
+    const payload = { ...values };
+
+    if (attachments && attachments.length > 0) {
+      payload.images = attachments;
+    }
+
     if (editing) {
-      updateMut.mutate({ id: editing.id, data: values as Partial<Product> });
+      updateMut.mutate({ id: editing.id, data: payload });
     } else {
-      createMut.mutate({ ...values, shop_id: user?.id });
+      createMut.mutate(payload);
     }
     setOpen(false);
   };
@@ -120,14 +207,16 @@ export default function ClientMyProductsPage() {
         <Card className="p-6">
           <CardContent>
             {isLoading ? (
-              <div>Đang tải...</div>
+              <div className="flex justify-center mt-4">
+                <Loader2 className="animate-spin" size={32} />
+              </div>
             ) : (
               <div className="flex flex-col gap-6">
                 <div className="grid grid-cols-1 gap-3">
                   {products.map((p) => (
                     <div
                       key={p.id}
-                      className="flex items-center justify-between bg-background/50 p-3 rounded"
+                      className="flex items-center justify-between bg-background p-3 rounded"
                     >
                       <div className="flex items-center space-x-4">
                         <img
@@ -179,7 +268,7 @@ export default function ClientMyProductsPage() {
             {/* hidden trigger - we use explicit buttons */}
             <div />
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent aria-describedby={undefined}>
             <DialogHeader>
               <DialogTitle>
                 {editing ? "Sửa sản phẩm" : "Tạo sản phẩm"}
@@ -203,7 +292,9 @@ export default function ClientMyProductsPage() {
                 </FormItem>
 
                 <FormItem>
-                  <FormLabel htmlFor="price">Giá (VND)</FormLabel>
+                  <FormLabel htmlFor="price">
+                    Giá cho thuê / ngày (VND)
+                  </FormLabel>
                   <FormControl>
                     <Input
                       id="price"
@@ -224,6 +315,88 @@ export default function ClientMyProductsPage() {
                       {...methods.register("stock", { valueAsNumber: true })}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+
+                <FormItem>
+                  <FormLabel htmlFor="category_id">Danh mục</FormLabel>
+                  <FormControl>
+                    <Controller
+                      control={methods.control}
+                      name="category_id"
+                      render={({ field }) => (
+                        <Select
+                          value={field.value ? String(field.value) : undefined}
+                          onValueChange={(v: string) =>
+                            field.onChange(Number(v))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Chọn danh mục" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Danh mục</SelectLabel>
+                              {categories?.map((c: any) => (
+                                <SelectItem key={c.id} value={String(c.id)}>
+                                  {c.name}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+
+                <FormItem>
+                  <FormLabel htmlFor="images">Hình ảnh</FormLabel>
+                  <FormControl>
+                    <div
+                      {...getRootProps()}
+                      className={`border-dashed border-2 p-4 rounded text-center cursor-pointer ${
+                        isDragActive
+                          ? "border-primary bg-primary/10"
+                          : "border-muted hover:border-primary"
+                      } `}
+                    >
+                      <input {...getInputProps()} />
+                      <div className="text-sm text-muted-foreground">
+                        Kéo thả ảnh vào đây, hoặc click để chọn (tối đa nhiều
+                        ảnh)
+                      </div>
+                    </div>
+                  </FormControl>
+                  {loadingAttachments && (
+                    <div className="flex justify-center mt-4">
+                      <Loader2 className="animate-spin" size={32} />
+                    </div>
+                  )}
+                  {!loadingAttachments && attachments.length > 0 && (
+                    <div className="mt-2 grid grid-cols-6 gap-2">
+                      {attachments.map((url, i) => (
+                        <div key={`attach-${i}`} className="relative">
+                          <img
+                            src={url}
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAttachments((prev) =>
+                                prev.filter((_, idx) => idx !== i)
+                              );
+                            }}
+                            className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\UploadController;
 
 // ========================== Public routes ==========================
 // 1. Auth & User
@@ -47,4 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/comments', [CommentController::class, 'store']);
     Route::put('/comments/{id}', [CommentController::class, 'update']);
     Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
+
+    // 6. Upload files
+    Route::post('/uploads', [UploadController::class, 'upload']);
 });

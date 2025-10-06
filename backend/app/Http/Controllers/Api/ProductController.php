@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 // use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
@@ -44,16 +45,16 @@ class ProductController extends Controller
 
         try {
             $product = Product::create([
-            'name'        => $request->name,
-            'slug'        => Str::slug($request->name),
-            'description' => $request->description,
-            'price'       => $request->price,
-            'stock'       => $request->stock,
-            'image_url'   => $request->image_url,
-            'images'      => $request->images,
-            'status'      => $request->status ?? 'Còn hàng',
-            'category_id' => $request->category_id,
-            'shop_id'     => $user->role === 'shop' ? $user->id : ($request->shop_id ?? $user->id),
+                'name'        => $request->name,
+                'slug'        => Str::slug($request->name),
+                'description' => $request->description,
+                'price'       => $request->price,
+                'stock'       => $request->stock,
+                'image_url'   => $request->images[0] ?? null,
+                'images'      => $request->images ?? null,
+                'status'      => $request->status ?? 'Còn hàng',
+                'category_id' => $request->category_id,
+                'shop_id'     => $user->role === 'shop' ? $user->id : ($request->shop_id ?? $user->id),
             ]);
 
             return response()->json($product, 201);
@@ -132,10 +133,12 @@ class ProductController extends Controller
             'images'      => 'nullable|array',
         ]);
 
-        $product->update(array_merge(
-            $request->all(),
-            $request->name ? ['slug' => Str::slug($request->name)] : []
-        ));
+        $data = $request->all();
+        if ($request->name) {
+            $data['slug'] = Str::slug($request->name);
+        }
+
+        $product->update($data);
 
         return response()->json($product);
     }
