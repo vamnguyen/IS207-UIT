@@ -29,8 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Product } from "@/lib/types";
-import { useForm } from "react-hook-form";
-import { Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { getCategories } from "@/services/categories";
 import {
   Select,
@@ -216,7 +215,7 @@ export default function ClientMyProductsPage() {
                   {products.map((p) => (
                     <div
                       key={p.id}
-                      className="flex items-center justify-between bg-background p-3 rounded"
+                      className="flex items-center justify-between bg-white dark:bg-background p-3 rounded shadow-sm border border-gray-100 dark:border-transparent hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-center space-x-4">
                         <img
@@ -224,7 +223,9 @@ export default function ClientMyProductsPage() {
                           className="w-12 h-12 object-cover rounded"
                         />
                         <div>
-                          <div className="font-medium">{p.name}</div>
+                          <div className="font-medium text-slate-900 dark:text-white">
+                            {p.name}
+                          </div>
                           <div className="text-sm text-muted-foreground">
                             {p.stock} sản phẩm • {p.price} / ngày
                           </div>
@@ -286,6 +287,17 @@ export default function ClientMyProductsPage() {
                     <Input
                       id="name"
                       {...methods.register("name", { required: true })}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+
+                <FormItem>
+                  <FormLabel htmlFor="description">Mô tả sản phẩm</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="description"
+                      {...methods.register("description")}
                     />
                   </FormControl>
                   <FormMessage />
@@ -377,7 +389,10 @@ export default function ClientMyProductsPage() {
                   {!loadingAttachments && attachments.length > 0 && (
                     <div className="mt-2 grid grid-cols-6 gap-2">
                       {attachments.map((url, i) => (
-                        <div key={`attach-${i}`} className="relative">
+                        <div
+                          key={`attach-${i}`}
+                          className="relative bg-white dark:bg-transparent p-1 rounded border border-gray-100"
+                        >
                           <img
                             src={url}
                             className="w-20 h-20 object-cover rounded"
@@ -389,7 +404,8 @@ export default function ClientMyProductsPage() {
                                 prev.filter((_, idx) => idx !== i)
                               );
                             }}
-                            className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center"
+                            aria-label="Xoá ảnh"
+                            className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center shadow-md"
                           >
                             <X size={12} />
                           </button>

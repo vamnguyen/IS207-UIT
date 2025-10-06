@@ -15,25 +15,24 @@ class AuthController extends Controller
      * Xử lý yêu cầu đăng ký người dùng mới.
      */
     public function register(Request $request) {
-        // Validate dữ liệu đầu vào
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'sometimes|in:admin,shop,customer',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Tạo người dùng mới
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $request->role ?? 'customer',
         ]);
 
-        // Tạo token cho người dùng
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

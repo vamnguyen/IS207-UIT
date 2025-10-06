@@ -34,7 +34,7 @@ export function RegisterForm() {
       email: "",
       password: "",
       password_confirmation: "",
-      role: Role.CUSTOMER,
+      role: Role.SHOP,
     },
   });
 

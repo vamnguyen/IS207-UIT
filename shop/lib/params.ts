@@ -1,8 +1,11 @@
+import { Role } from "./enum";
+
 export type registerParams = {
   name: string;
   email: string;
   password: string;
   password_confirmation: string;
+  role?: Role;
 };
 
 export type loginParams = {
