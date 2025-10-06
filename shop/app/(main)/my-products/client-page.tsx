@@ -212,6 +212,12 @@ export default function ClientMyProductsPage() {
             ) : (
               <div className="flex flex-col gap-6">
                 <div className="grid grid-cols-1 gap-3">
+                  {products.length === 0 && (
+                    <div className="text-center text-muted-foreground">
+                      Không có sản phẩm nào
+                    </div>
+                  )}
+
                   {products.map((p) => (
                     <div
                       key={p.id}
@@ -251,13 +257,15 @@ export default function ClientMyProductsPage() {
                     </div>
                   ))}
                 </div>
-                <div>
-                  <PaginationControl
-                    current_page={paginated?.current_page}
-                    last_page={paginated?.last_page}
-                    onChange={(p: number) => setPage(p)}
-                  />
-                </div>
+                {products.length > 0 && (
+                  <div>
+                    <PaginationControl
+                      current_page={paginated?.current_page}
+                      last_page={paginated?.last_page}
+                      onChange={(p: number) => setPage(p)}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
