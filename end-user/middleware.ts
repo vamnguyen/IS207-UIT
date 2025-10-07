@@ -5,7 +5,6 @@ const publicPaths: string[] = [
   "/",
   "/login",
   "/register",
-  "/cart",
   "/categories",
   "/products",
   "/about",

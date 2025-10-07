@@ -15,10 +15,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "@/components/mode-toggle";
-import { useCart } from "@/hooks/use-cart";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "@/services/auth";
 import { useRouter } from "next/navigation";
+import { useGetCart } from "@/hooks/use-cart";
 
 const navItems = [
   {
@@ -39,7 +39,6 @@ const navItems = [
 export function AppHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { getTotalItems } = useCart();
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
@@ -48,6 +47,8 @@ export function AppHeader() {
     enabled: !!Cookies.get("auth_token"), // Chỉ chạy khi có auth_token
     staleTime: Infinity,
   });
+
+  const { data: carts } = useGetCart();
 
   const handleLogout = async () => {
     await logout();
@@ -109,7 +110,7 @@ export function AppHeader() {
               >
                 <ShoppingCart className="h-5 w-5" />
                 <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                  {getTotalItems()}
+                  {carts?.length || 0}
                 </Badge>
               </Button>
             </Link>

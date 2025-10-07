@@ -30,3 +30,18 @@ export type updateCommentParams = {
   content: string;
   product_id: number;
 };
+
+export type addProductToCartParams = {
+  product_id: number;
+  quantity: number;
+  start_date: string;
+  end_date: string;
+  days: number;
+};
+
+export type updateCartItemParams = {
+  quantity: number;
+  start_date: string;
+  end_date: string;
+  days: number;
+};

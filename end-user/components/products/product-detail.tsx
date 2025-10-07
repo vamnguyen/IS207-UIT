@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import type { Product } from "@/lib/types";
 import { formatCurrency, calculateDays } from "@/lib/utils";
-import { useCart } from "@/hooks/use-cart";
+import { useAddProductToCart } from "@/hooks/use-cart";
 import {
   Star,
   Heart,
@@ -30,11 +30,11 @@ interface ProductDetailProps {
 }
 
 export function ProductDetail({ product }: ProductDetailProps) {
-  const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
+  const { mutate: addToCart } = useAddProductToCart();
 
   const days = startDate && endDate ? calculateDays(startDate, endDate) : 1;
   const totalPrice = product.price * quantity * days;
@@ -50,7 +50,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
       return;
     }
 
-    addToCart(product, quantity, startDate, endDate);
+    addToCart({
+      product_id: product.id,
+      quantity,
+      start_date: startDate,
+      end_date: endDate,
+      days,
+    });
     toast.success("Đã thêm vào giỏ hàng");
   };
 

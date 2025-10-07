@@ -36,13 +36,15 @@ export interface Product {
 }
 
 export interface CartItem {
-  id: string;
+  id: number;
   product: Product;
   quantity: number;
   start_date: string;
   end_date: string;
   days: number;
   total_price: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Order {

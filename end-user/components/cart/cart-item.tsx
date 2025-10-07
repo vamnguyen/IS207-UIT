@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState, useRef } from "react";
+import debounce from "lodash.debounce";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { CartItem as CartItemType } from "@/lib/types";
-import { useCart } from "@/hooks/use-cart";
+import { useUpdateCartItem, useDeleteCartItem } from "@/hooks/use-cart";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Minus, Plus, Trash2, Calendar } from "lucide-react";
 
@@ -13,17 +15,36 @@ interface CartItemProps {
 }
 
 export function CartItem({ item }: CartItemProps) {
-  const { updateQuantity, removeFromCart } = useCart();
+  const { mutate: updateCartItem } = useUpdateCartItem();
+  const { mutate: removeCartItem } = useDeleteCartItem();
+  const [localQuantity, setLocalQuantity] = useState(item.quantity);
 
-  const handleQuantityChange = (change: number) => {
-    const newQuantity = item.quantity + change;
-    if (newQuantity >= 1 && newQuantity <= item.product.stock) {
-      updateQuantity(item.id, newQuantity);
-    }
+  useEffect(() => {
+    setLocalQuantity(item.quantity);
+  }, [item.quantity]);
+
+  // Debounce API call
+  const debouncedUpdate = useRef(
+    debounce((newQuantity: number) => {
+      updateCartItem({
+        cartId: item.id,
+        data: {
+          quantity: newQuantity,
+          start_date: item.start_date,
+          end_date: item.end_date,
+          days: item.days,
+        },
+      });
+    }, 400)
+  ).current;
+
+  const handleUpdate = (newQuantity: number) => {
+    setLocalQuantity(newQuantity);
+    debouncedUpdate(newQuantity);
   };
 
   return (
-    <Card className="rounded-2xl border-0 bg-background/60 backdrop-blur">
+    <Card className="rounded-2xl border bg-background/60 backdrop-blur">
       <CardContent className="p-6">
         <div className="flex gap-4">
           {/* Product Image */}
@@ -55,7 +76,7 @@ export function CartItem({ item }: CartItemProps) {
                 variant="ghost"
                 size="sm"
                 className="text-destructive hover:text-destructive rounded-2xl"
-                onClick={() => removeFromCart(item.id)}
+                onClick={() => removeCartItem(item.id)}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -77,20 +98,20 @@ export function CartItem({ item }: CartItemProps) {
                   variant="outline"
                   size="sm"
                   className="rounded-2xl bg-transparent w-8 h-8 p-0"
-                  onClick={() => handleQuantityChange(-1)}
-                  disabled={item.quantity <= 1}
+                  onClick={() => handleUpdate(localQuantity - 1)}
+                  disabled={localQuantity <= 1}
                 >
                   <Minus className="h-3 w-3" />
                 </Button>
                 <span className="font-medium w-8 text-center">
-                  {item.quantity}
+                  {localQuantity}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
                   className="rounded-2xl bg-transparent w-8 h-8 p-0"
-                  onClick={() => handleQuantityChange(1)}
-                  disabled={item.quantity >= item.product.stock}
+                  onClick={() => handleUpdate(localQuantity + 1)}
+                  disabled={localQuantity >= item.product.stock}
                 >
                   <Plus className="h-3 w-3" />
                 </Button>
@@ -101,7 +122,7 @@ export function CartItem({ item }: CartItemProps) {
                   {formatCurrency(item.total_price)}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {item.quantity} x {item.days} ngày
+                  {localQuantity} x {item.days} ngày
                 </div>
               </div>
             </div>

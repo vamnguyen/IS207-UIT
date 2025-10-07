@@ -1,84 +1,98 @@
-"use client";
+import Cookies from "js-cookie";
+import { updateCartItemParams } from "@/lib/params";
+import { CartItem } from "@/lib/types";
+import {
+  addProductToCart,
+  clearCart,
+  deleteCartItem,
+  getCart,
+  updateCartItem,
+} from "@/services/cart";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-import { useState, useEffect } from "react";
-import type { CartItem, Product } from "@/lib/types";
-import { generateId, calculateDays } from "@/lib/utils";
+export const useGetCart = () => {
+  return useQuery({
+    queryKey: ["cart"],
+    queryFn: getCart,
+    enabled: !!Cookies.get("auth_token"),
+    retry: 1,
+  });
+};
 
-export function useCart() {
-  const [items, setItems] = useState<CartItem[]>([]);
+export const useAddProductToCart = () => {
+  const queryClient = useQueryClient();
 
-  // Load cart from localStorage on mount
-  useEffect(() => {
-    const savedCart = localStorage.getItem("order-cart");
-    if (savedCart) {
-      setItems(JSON.parse(savedCart));
-    }
-  }, []);
+  return useMutation({
+    mutationFn: addProductToCart,
+    onSuccess: (data: CartItem) => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      toast.success(`Thêm ${data.product.name} vào giỏ hàng thành công`);
+    },
+  });
+};
 
-  // Save cart to localStorage whenever items change
-  useEffect(() => {
-    localStorage.setItem("order-cart", JSON.stringify(items));
-  }, [items]);
+export const useUpdateCartItem = () => {
+  const queryClient = useQueryClient();
 
-  const addToCart = (
-    product: Product,
-    quantity: number,
-    startDate: string,
-    endDate: string
-  ) => {
-    const days = calculateDays(startDate, endDate);
-    const total_price = product.price * quantity * days;
+  return useMutation({
+    mutationFn: ({
+      cartId,
+      data,
+    }: {
+      cartId: number;
+      data: updateCartItemParams;
+    }) => updateCartItem(cartId, data),
+    // Optimistic UI
+    onMutate: async ({ cartId, data }) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previousCart = queryClient.getQueryData<CartItem[]>(["cart"]);
+      // Optimistically update cart item quantity
+      if (previousCart) {
+        queryClient.setQueryData<CartItem[]>(["cart"], (prev) =>
+          prev?.map((item) =>
+            item.id === cartId ? { ...item, quantity: data.quantity } : item
+          )
+        );
+      }
+      return { previousCart };
+    },
+    onError: (err, variables, context) => {
+      // Rollback nếu lỗi
+      if (context?.previousCart) {
+        queryClient.setQueryData(["cart"], context.previousCart);
+      }
+      toast.error("Cập nhật giỏ hàng thất bại");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onSuccess: (data: CartItem) => {
+      toast.success(`Cập nhật ${data.product.name} trong giỏ hàng thành công`);
+    },
+  });
+};
 
-    const newItem: CartItem = {
-      id: generateId(),
-      product,
-      quantity,
-      start_date: startDate,
-      end_date: endDate,
-      days,
-      total_price,
-    };
+export const useDeleteCartItem = () => {
+  const queryClient = useQueryClient();
 
-    setItems((prev) => [...prev, newItem]);
-  };
+  return useMutation({
+    mutationFn: (cartId: number) => deleteCartItem(cartId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      toast.success(`Xoá khỏi giỏ hàng thành công`);
+    },
+  });
+};
 
-  const removeFromCart = (itemId: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== itemId));
-  };
+export const useClearCart = () => {
+  const queryClient = useQueryClient();
 
-  const updateQuantity = (itemId: string, quantity: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === itemId
-          ? {
-              ...item,
-              quantity,
-              total_price: item.product.price * quantity * item.days,
-            }
-          : item
-      )
-    );
-  };
-
-  const clearCart = () => {
-    setItems([]);
-  };
-
-  const getTotalAmount = () => {
-    return items.reduce((total, item) => total + item.total_price, 0);
-  };
-
-  const getTotalItems = () => {
-    return items.reduce((total, item) => total + item.quantity, 0);
-  };
-
-  return {
-    items,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getTotalAmount,
-    getTotalItems,
-  };
-}
+  return useMutation({
+    mutationFn: clearCart,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      toast.success(`Xoá tất cả sản phẩm trong giỏ hàng thành công`);
+    },
+  });
+};

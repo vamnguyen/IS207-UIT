@@ -28,10 +28,6 @@ export function calculateDays(startDate: string, endDate: string): number {
   return diffDays || 1; // Minimum 1 day
 }
 
-export function generateId(): string {
-  return Math.random().toString(36).substr(2, 9);
-}
-
 export function getInitials(name: string): string {
   return name
     .split(" ")
