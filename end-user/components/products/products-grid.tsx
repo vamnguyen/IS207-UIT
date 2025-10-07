@@ -5,15 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
-import { Star, Heart, ShoppingCart } from "lucide-react";
-import { useCart } from "@/hooks/use-cart";
+import { Star, Heart } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Product } from "@/lib/types";
 import { ProductStatus } from "@/lib/enum";
 
 export function ProductsGrid({ products }: { products: Product[] }) {
-  const { addToCart } = useCart();
   const [favorites, setFavorites] = useState<number[]>([]);
 
   const toggleFavorite = (productId: number) => {
@@ -22,21 +19,6 @@ export function ProductsGrid({ products }: { products: Product[] }) {
         ? prev.filter((id) => id !== productId)
         : [...prev, productId]
     );
-  };
-
-  const handleQuickRent = (product: any) => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    addToCart(
-      product,
-      1,
-      today.toISOString().split("T")[0],
-      tomorrow.toISOString().split("T")[0]
-    );
-
-    toast.success("Đã thêm vào giỏ hàng");
   };
 
   return (
@@ -131,22 +113,11 @@ export function ProductsGrid({ products }: { products: Product[] }) {
                     <div className="text-sm text-muted-foreground">/ ngày</div>
                   </div>
 
-                  <div className="flex space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-2xl bg-transparent"
-                      onClick={() => handleQuickRent(product)}
-                      disabled={product.status !== ProductStatus.IN_STOCK}
-                    >
-                      <ShoppingCart className="h-4 w-4" />
+                  <Link href={`/products/${product.id}`}>
+                    <Button size="sm" className="rounded-2xl">
+                      Xem chi tiết
                     </Button>
-                    <Link href={`/products/${product.id}`}>
-                      <Button size="sm" className="rounded-2xl">
-                        Xem chi tiết
-                      </Button>
-                    </Link>
-                  </div>
+                  </Link>
                 </div>
               </div>
             </CardContent>
