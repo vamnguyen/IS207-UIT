@@ -45,7 +45,7 @@ export interface CartItem {
   total_price: number;
 }
 
-export interface Rental {
+export interface Order {
   id: number;
   user_id: number;
   user: User;
@@ -55,23 +55,23 @@ export interface Rental {
   status: "pending" | "confirmed" | "active" | "returned" | "cancelled";
   created_at: string;
   updated_at: string;
-  rental_items: RentalItem[];
+  order_items: OrderItem[];
 }
 
-export interface RentalItem {
+export interface OrderItem {
   id: number;
-  rental_id: number;
+  order_id: number;
   product_id: number;
   product: Product;
   quantity: number;
-  price_per_day: number;
+  price: number;
   days: number;
   subtotal: number;
 }
 
 export interface Payment {
   id: number;
-  rental_id: number;
+  order_id: number;
   payment_method: "cash" | "bank_transfer" | "card";
   amount: number;
   status: "pending" | "completed" | "failed";

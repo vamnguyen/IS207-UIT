@@ -31,7 +31,7 @@ export function CartItem({ item }: CartItemProps) {
             <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-muted/50 to-muted/20 flex-shrink-0">
               <img
                 src={item.product.image_url || "/file.svg"}
-                alt={item.product.product_name}
+                alt={item.product.name}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -43,11 +43,11 @@ export function CartItem({ item }: CartItemProps) {
               <div>
                 <Link href={`/products/${item.product.id}`}>
                   <h3 className="font-semibold text-lg hover:text-primary transition-colors text-balance">
-                    {item.product.product_name}
+                    {item.product.name}
                   </h3>
                 </Link>
                 <p className="text-sm text-muted-foreground">
-                  {formatCurrency(item.product.price_per_day)} / ngày
+                  {formatCurrency(item.product.price)} / ngày
                 </p>
               </div>
 

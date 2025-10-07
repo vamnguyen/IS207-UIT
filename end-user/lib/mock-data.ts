@@ -39,7 +39,7 @@ export const mockProducts = [
     product_name: 'MacBook Pro 16" M3',
     description:
       "Laptop cao cấp cho công việc và sáng tạo. Chip M3 mạnh mẽ, màn hình Retina sắc nét.",
-    price_per_day: 150000,
+    price: 150000,
     stock: 3,
     category_id: "1",
     image_url:
@@ -58,7 +58,7 @@ export const mockProducts = [
     product_name: "Canon EOS R5",
     description:
       "Máy ảnh mirrorless chuyên nghiệp. Cảm biến 45MP, quay video 8K.",
-    price_per_day: 200000,
+    price: 200000,
     stock: 2,
     category_id: "1",
     image_url:
@@ -77,7 +77,7 @@ export const mockProducts = [
     product_name: "Bàn làm việc gỗ tự nhiên",
     description:
       "Bàn làm việc cao cấp từ gỗ sồi tự nhiên. Kích thước 120x60cm.",
-    price_per_day: 50000,
+    price: 50000,
     stock: 5,
     category_id: "2",
     image_url:
@@ -95,7 +95,7 @@ export const mockProducts = [
     id: "4",
     product_name: "Xe đạp thể thao Giant",
     description: "Xe đạp thể thao cao cấp, khung nhôm nhẹ, 21 tốc độ.",
-    price_per_day: 80000,
+    price: 80000,
     stock: 4,
     category_id: "3",
     image_url:
@@ -113,7 +113,7 @@ export const mockProducts = [
     product_name: "Váy dạ hội sang trọng",
     description:
       "Váy dạ hội thiết kế cao cấp, phù hợp cho các sự kiện quan trọng.",
-    price_per_day: 120000,
+    price: 120000,
     stock: 2,
     category_id: "4",
     image_url:
@@ -132,7 +132,7 @@ export const mockProducts = [
     id: "6",
     product_name: "Loa Bluetooth JBL",
     description: "Loa không dây chất lượng cao, âm thanh sống động.",
-    price_per_day: 30000,
+    price: 30000,
     stock: 8,
     category_id: "1",
     image_url:

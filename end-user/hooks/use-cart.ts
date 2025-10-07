@@ -9,7 +9,7 @@ export function useCart() {
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem("rental-cart");
+    const savedCart = localStorage.getItem("order-cart");
     if (savedCart) {
       setItems(JSON.parse(savedCart));
     }
@@ -17,7 +17,7 @@ export function useCart() {
 
   // Save cart to localStorage whenever items change
   useEffect(() => {
-    localStorage.setItem("rental-cart", JSON.stringify(items));
+    localStorage.setItem("order-cart", JSON.stringify(items));
   }, [items]);
 
   const addToCart = (
