@@ -19,6 +19,8 @@ Route::get('/categories/{category}/products', [ProductController::class, 'getByC
 // 3. Product
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
+// 4. Comment
+Route::get('/comments', [CommentController::class, 'index']);
 
 // ========================== Protected routes ==========================
 Route::middleware('auth:sanctum')->group(function () {
@@ -44,7 +46,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // 5. Comment
-    Route::get('/comments', [CommentController::class, 'index']);
     Route::post('/comments', [CommentController::class, 'store']);
     Route::put('/comments/{id}', [CommentController::class, 'update']);
     Route::delete('/comments/{id}', [CommentController::class, 'destroy']);
