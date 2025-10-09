@@ -1,16 +1,17 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { PaymentMethod } from "./enum";
+import { OrderStatus, PaymentMethod, PaymentStatus } from "./enum";
+import { Package, Clock, CheckCircle, XCircle, Truck } from "lucide-react";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number): string {
+export function formatCurrency(amount: string | number): string {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
-  }).format(amount);
+  }).format(Number(amount));
 }
 
 export function formatDate(date: string): string {
@@ -50,3 +51,47 @@ export function getPaymentMethodLabel(method: PaymentMethod): string {
       return "Tiền mặt";
   }
 }
+
+export const statusConfig: Record<
+  OrderStatus,
+  {
+    label: OrderStatus;
+    variant: "default" | "secondary" | "destructive" | "outline";
+    icon: any;
+  }
+> = {
+  pending: { label: OrderStatus.PENDING, variant: "secondary", icon: Clock },
+  confirmed: {
+    label: OrderStatus.CONFIRMED,
+    variant: "default",
+    icon: CheckCircle,
+  },
+  processing: {
+    label: OrderStatus.PROCESSING,
+    variant: "default",
+    icon: Package,
+  },
+  shipped: { label: OrderStatus.SHIPPED, variant: "default", icon: Truck },
+  delivered: {
+    label: OrderStatus.DELIVERED,
+    variant: "default",
+    icon: CheckCircle,
+  },
+  cancelled: {
+    label: OrderStatus.CANCELLED,
+    variant: "destructive",
+    icon: XCircle,
+  },
+};
+
+export const paymentStatusConfig: Record<
+  PaymentStatus,
+  {
+    label: PaymentStatus;
+    variant: "default" | "secondary" | "destructive" | "outline";
+  }
+> = {
+  pending: { label: PaymentStatus.PENDING, variant: "secondary" },
+  completed: { label: PaymentStatus.COMPLETED, variant: "default" },
+  failed: { label: PaymentStatus.FAILED, variant: "destructive" },
+};

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\UploadController;
 
@@ -67,4 +68,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // 8. Payment
     Route::post('/checkout/card', [PaymentController::class, 'checkoutCard']);
+
+    // 9. Orders
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
 });

@@ -17,6 +17,7 @@ import {
   Save,
   X,
   CheckCircle,
+  HomeIcon,
 } from "lucide-react";
 import { getCurrentUser } from "@/services/auth";
 import { toast } from "sonner";
@@ -29,6 +30,7 @@ export function ProfileClient() {
   const [editData, setEditData] = useState({
     name: "",
     email: "",
+    address: "",
   });
 
   const {
@@ -48,6 +50,7 @@ export function ProfileClient() {
       setEditData({
         name: user.name,
         email: user.email,
+        address: user.address || "",
       });
       setIsEditing(true);
     }
@@ -55,7 +58,7 @@ export function ProfileClient() {
 
   const handleCancel = () => {
     setIsEditing(false);
-    setEditData({ name: "", email: "" });
+    setEditData({ name: "", email: "", address: "" });
   };
 
   const handleSave = () => {
@@ -196,6 +199,28 @@ export function ProfileClient() {
             ) : (
               <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
                 {user.email}
+              </p>
+            )}
+          </div>
+
+          {/* Address */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <HomeIcon className="h-4 w-4" />
+              Địa chỉ
+            </Label>
+            {isEditing ? (
+              <Input
+                type="address"
+                value={editData.address}
+                onChange={(e) =>
+                  setEditData({ ...editData, address: e.target.value })
+                }
+                placeholder="Nhập địa chỉ"
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+                {user.address || "Chưa cập nhật"}
               </p>
             )}
           </div>

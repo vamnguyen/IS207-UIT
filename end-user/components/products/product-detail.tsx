@@ -57,7 +57,6 @@ export function ProductDetail({ product }: ProductDetailProps) {
       end_date: endDate,
       days,
     });
-    toast.success("Đã thêm vào giỏ hàng");
   };
 
   const handleQuantityChange = (change: number) => {

@@ -15,6 +15,10 @@ class PaymentController extends Controller
      */
     public function checkoutCard(Request $request)
     {
+        $validated = $request->validate([
+        'address' => 'required|string|max:255',
+        ]);
+
         $user = $request->user();
 
         // Lấy toàn bộ cart items của user
@@ -38,6 +42,7 @@ class PaymentController extends Controller
                 'end_date' => $cartItems->max('end_date'),
                 'total_amount' => $totalAmount,
                 'status' => 'pending',
+                'address' => $validated['address'],
             ]);
 
             // 2️⃣ Lưu từng sản phẩm vào order_items
@@ -85,8 +90,8 @@ class PaymentController extends Controller
                     'payment_id' => $payment->id,
                     'user_id' => $user->id,
                 ],
-                'success_url' => env('FRONTEND_URL') . '/success?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => env('FRONTEND_URL') . '/cancel',
+                'success_url' => env('FRONTEND_URL') . '/checkout/success?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => env('FRONTEND_URL') . '/checkout/cancel',
                 'customer_email' => $user->email,
             ]);
 

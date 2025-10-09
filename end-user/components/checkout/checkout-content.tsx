@@ -70,7 +70,7 @@ export function CheckoutContent() {
     setIsProcessing(true);
     try {
       if (data.paymentMethod === PaymentMethod.CARD) {
-        const response = await checkoutByCard();
+        const response = await checkoutByCard({ address: data.address });
         router.push(response.url);
       } else if (data.paymentMethod === PaymentMethod.CASH) {
         toast.success(
@@ -132,6 +132,7 @@ export function CheckoutContent() {
                     placeholder="Nguyễn Văn An"
                     {...register("fullName")}
                     className="rounded-2xl"
+                    disabled
                   />
                   {errors.fullName && (
                     <p className="text-xs text-red-500 mt-1">

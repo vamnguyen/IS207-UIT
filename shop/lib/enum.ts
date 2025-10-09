@@ -10,7 +10,22 @@ export enum Role {
   ADMIN = "admin",
 }
 
-export enum UploadFolder {
-  PRODUCT_IMAGES = "product-images",
-  CATEGORY_IMAGES = "category-images",
+export enum PaymentMethod {
+  CASH = "cash",
+  BANK_TRANSFER = "bank_transfer",
+  CARD = "card",
+}
+
+export enum OrderStatus {
+  PENDING = "pending",
+  CONFIRMED = "confirmed",
+  ACTIVE = "active",
+  RETURNED = "returned",
+  CANCELLED = "cancelled",
+}
+
+export enum PaymentStatus {
+  PENDING = "pending",
+  COMPLETED = "completed",
+  FAILED = "failed",
 }

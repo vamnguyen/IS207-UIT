@@ -1,12 +1,18 @@
-import { ProductStatus, Role } from "./enum";
+import {
+  OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
+  ProductStatus,
+  Role,
+} from "./enum";
 
 export interface User {
   id: number;
   name: string;
   email: string;
   role: Role;
-  address?: string;
-  avatar_url?: string;
+  address: string | null;
+  avatar_url: string | null;
   created_at: string;
 }
 
@@ -55,11 +61,13 @@ export interface Order {
   user: User;
   start_date: string;
   end_date: string;
-  total_amount: number;
-  status: "pending" | "confirmed" | "active" | "returned" | "cancelled";
+  total_amount: string;
+  status: OrderStatus;
+  address: string | null;
   created_at: string;
   updated_at: string;
-  order_items: OrderItem[];
+  items: OrderItem[];
+  payment: Payment;
 }
 
 export interface OrderItem {
@@ -68,18 +76,21 @@ export interface OrderItem {
   product_id: number;
   product: Product;
   quantity: number;
-  price: number;
+  price: string;
   days: number;
-  subtotal: number;
+  subtotal: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Payment {
   id: number;
   order_id: number;
-  payment_method: "cash" | "bank_transfer" | "card";
-  amount: number;
-  status: "pending" | "completed" | "failed";
+  payment_method: PaymentMethod;
+  amount: string;
+  status: PaymentStatus;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Comment {

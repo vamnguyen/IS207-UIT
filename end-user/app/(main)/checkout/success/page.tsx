@@ -4,13 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  CheckCircle,
-  Package,
-  Calendar,
-  CreditCard,
-  ArrowRight,
-} from "lucide-react";
+import { CheckCircle, Package, Calendar, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function CheckoutSuccessPage() {
@@ -32,7 +26,7 @@ export default function CheckoutSuccessPage() {
 
   useEffect(() => {
     if (countdown === 0) {
-      router.push("/");
+      router.push("/orders");
     }
   }, [countdown, router]);
 
@@ -142,7 +136,7 @@ export default function CheckoutSuccessPage() {
 
           {/* Auto Redirect */}
           <div className="text-sm text-muted-foreground">
-            Tự động chuyển về trang chủ sau {countdown} giây
+            Tự động chuyển về trang đơn hàng sau {countdown} giây
           </div>
         </div>
       </div>
