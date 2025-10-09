@@ -17,6 +17,8 @@ export const useGetCart = () => {
     queryFn: getCart,
     enabled: !!Cookies.get("auth_token"),
     retry: 1,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 };
 
