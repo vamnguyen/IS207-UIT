@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\UploadController;
 
 // ========================== Public routes ==========================
@@ -22,6 +23,9 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 // 4. Comment
 Route::get('/comments', [CommentController::class, 'index']);
+// 5. Payment
+Route::post('/stripe/webhook', [PaymentController::class, 'webhook']);
+
 
 // ========================== Protected routes ==========================
 Route::middleware('auth:sanctum')->group(function () {
@@ -60,4 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/cart/{itemId}', [CartController::class, 'update']);
     Route::delete('/cart/{itemId}', [CartController::class, 'destroy']);
     Route::delete('/cart', [CartController::class, 'clear']);
+
+    // 8. Payment
+    Route::post('/checkout/card', [PaymentController::class, 'checkoutCard']);
 });

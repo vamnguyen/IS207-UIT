@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { PaymentMethod } from "./enum";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -35,4 +36,17 @@ export function getInitials(name: string): string {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+}
+
+export function getPaymentMethodLabel(method: PaymentMethod): string {
+  switch (method) {
+    case PaymentMethod.CASH:
+      return "Tiền mặt";
+    case PaymentMethod.BANK_TRANSFER:
+      return "Chuyển khoản";
+    case PaymentMethod.CARD:
+      return "Thẻ tín dụng";
+    default:
+      return "Tiền mặt";
+  }
 }

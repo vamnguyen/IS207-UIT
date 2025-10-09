@@ -43,3 +43,7 @@ export type CreateCommentResponse = {
   created_at: string;
   id: number;
 };
+
+export type CheckoutByCardResponse = {
+  url: string;
+};

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Role } from "./enum";
+import { PaymentMethod, Role } from "./enum";
 
 export const registerSchema = z.object({
   name: z.string().min(1, "Vui lòng nhập họ tên"),
@@ -15,3 +15,12 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Vui lòng nhập mật khẩu"),
 });
 export type LoginFormData = z.infer<typeof loginSchema>;
+
+export const customerInfoSchema = z.object({
+  fullName: z.string().min(1, "Vui lòng nhập họ tên"),
+  email: z.email("Email không hợp lệ").min(1, "Vui lòng nhập email"),
+  address: z.string().min(1, "Vui lòng nhập địa chỉ"),
+  notes: z.string().optional(),
+  paymentMethod: z.enum(PaymentMethod),
+});
+export type CustomerInfo = z.infer<typeof customerInfoSchema>;

@@ -9,3 +9,23 @@ export enum Role {
   SHOP = "shop",
   ADMIN = "admin",
 }
+
+export enum PaymentMethod {
+  CASH = "cash",
+  BANK_TRANSFER = "bank_transfer",
+  CARD = "card",
+}
+
+export enum OrderStatus {
+  PENDING = "pending",
+  CONFIRMED = "confirmed",
+  ACTIVE = "active",
+  RETURNED = "returned",
+  CANCELLED = "cancelled",
+}
+
+export enum PaymentStatus {
+  PENDING = "pending",
+  COMPLETED = "completed",
+  FAILED = "failed",
+}
