@@ -20,8 +20,46 @@ class ProductController extends Controller
         // Ensure perPage is within reasonable bounds
         $perPage = max(1, min(100, $perPage));
 
-        $products = Product::with(['category', 'shop'])
-            ->paginate($perPage);
+        $query = Product::with(['category', 'shop']);
+
+        // Filters
+        if ($request->has('min_price')) {
+            $min = (float) $request->query('min_price');
+            $query->where('price', '>=', $min);
+        }
+
+        if ($request->has('max_price')) {
+            $max = (float) $request->query('max_price');
+            $query->where('price', '<=', $max);
+        }
+
+        if ($request->has('categories')) {
+            $cats = explode(',', $request->query('categories'));
+            $query->whereIn('category_id', $cats);
+        }
+
+        if ($request->has('status')) {
+            $statuses = explode(',', $request->query('status'));
+            $query->whereIn('status', $statuses);
+        }
+
+        // Sorting
+        if ($request->has('sort')) {
+            $sort = $request->query('sort');
+            switch ($sort) {
+                case 'price-low':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price-high':
+                    $query->orderBy('price', 'desc');
+                    break;
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+            }
+        }
+
+        $products = $query->paginate($perPage);
 
         return response()->json($products);
     }

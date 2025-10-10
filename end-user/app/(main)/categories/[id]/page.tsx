@@ -1,5 +1,4 @@
 import CategoryProducts from "@/components/categories/category-products";
-import { ProductsGrid } from "@/components/products/products-grid";
 import { getCategoryById } from "@/services/categories";
 import { getProductsByCategoryId } from "@/services/products";
 import type { Metadata } from "next";

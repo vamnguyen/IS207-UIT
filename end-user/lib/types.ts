@@ -108,3 +108,11 @@ export interface Comment {
   user: User;
   parent: Comment | null;
 }
+
+export type ProductFilters = {
+  min_price?: number;
+  max_price?: number;
+  categories?: number[];
+  status?: string[];
+  sort?: string;
+};

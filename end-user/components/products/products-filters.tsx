@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
 import { Category } from "@/lib/types";
+import { ProductStatus } from "@/lib/enum";
 
 const MIN_PRICE = 0;
 const MAX_PRICE = 10000000;
@@ -96,24 +97,20 @@ export function ProductsFilters({ categories }: { categories: Category[] }) {
           <CardTitle className="text-lg">Tình trạng</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {[
-            { value: "available", label: "Còn hàng" },
-            { value: "rented", label: "Đang cho thuê" },
-            { value: "maintenance", label: "Bảo trì" },
-          ].map((status) => (
-            <div key={status.value} className="flex items-center space-x-2">
+          {Object.entries(ProductStatus).map(([key, value]) => (
+            <div key={key} className="flex items-center space-x-2">
               <Checkbox
-                id={`status-${status.value}`}
-                checked={selectedStatus.includes(status.value)}
+                id={`${key}`}
+                checked={selectedStatus.includes(key)}
                 onCheckedChange={(checked) =>
-                  handleStatusChange(status.value, checked as boolean)
+                  handleStatusChange(key, checked as boolean)
                 }
               />
               <Label
-                htmlFor={`status-${status.value}`}
+                htmlFor={`${key}`}
                 className="text-sm font-normal cursor-pointer"
               >
-                {status.label}
+                {value}
               </Label>
             </div>
           ))}
