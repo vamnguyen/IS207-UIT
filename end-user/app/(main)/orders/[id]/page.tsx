@@ -6,14 +6,15 @@ export const metadata: Metadata = {
   description: "Xem chi tiết đơn hàng thuê",
 };
 
-export default function OrderDetailPage({
+export default async function OrderDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const { id } = await params;
   return (
     <div className="container mx-auto px-4 py-8">
-      <DetailsOrderClient id={Number(params.id)} />
+      <DetailsOrderClient id={Number(id)} />
     </div>
   );
 }

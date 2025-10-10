@@ -9,8 +9,11 @@ import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
 import { Category } from "@/lib/types";
 
+const MIN_PRICE = 0;
+const MAX_PRICE = 10000000;
+
 export function ProductsFilters({ categories }: { categories: Category[] }) {
-  const [priceRange, setPriceRange] = useState([0, 500000]);
+  const [priceRange, setPriceRange] = useState([MIN_PRICE, MAX_PRICE]);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
 
@@ -33,7 +36,7 @@ export function ProductsFilters({ categories }: { categories: Category[] }) {
   };
 
   const clearFilters = () => {
-    setPriceRange([0, 500000]);
+    setPriceRange([MIN_PRICE, MAX_PRICE]);
     setSelectedCategories([]);
     setSelectedStatus([]);
   };
@@ -49,9 +52,9 @@ export function ProductsFilters({ categories }: { categories: Category[] }) {
           <Slider
             value={priceRange}
             onValueChange={setPriceRange}
-            max={500000}
-            min={0}
-            step={10000}
+            max={MAX_PRICE}
+            min={MIN_PRICE}
+            step={100000}
             className="w-full"
           />
           <div className="flex items-center justify-between text-sm">
@@ -142,7 +145,6 @@ export function ProductsFilters({ categories }: { categories: Category[] }) {
         </CardContent>
       </Card>
 
-      {/* Clear Filters */}
       <Button
         variant="outline"
         className="w-full rounded-2xl bg-transparent"

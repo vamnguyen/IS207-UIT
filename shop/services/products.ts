@@ -4,7 +4,7 @@ import { Product } from "@/lib/types";
 
 export const getProducts = async (
   page: number = 1,
-  per_page: number = 9
+  per_page: number = 6
 ): Promise<PaginatedResponse<Product>> => {
   const response = await axiosInstance.get(
     `${process.env.NEXT_PUBLIC_API_URL}/products`,

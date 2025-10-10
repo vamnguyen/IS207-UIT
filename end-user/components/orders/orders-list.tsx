@@ -98,7 +98,7 @@ export function OrdersList({ orders }: { orders: Order[] }) {
                   <TableHead>Số lượng</TableHead>
                   <TableHead>Tổng tiền</TableHead>
                   <TableHead>Trạng thái</TableHead>
-                  <TableHead className="text-right">Thao tác</TableHead>
+                  <TableHead className="text-center">Thao tác</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -157,7 +157,7 @@ export function OrdersList({ orders }: { orders: Order[] }) {
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm" asChild>
                             <Link href={`/orders/${order.id}`}>
-                              <Eye className="mr-2 h-4 w-4" />
+                              <Eye className="h-4 w-4" />
                               Chi tiết
                             </Link>
                           </Button>

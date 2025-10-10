@@ -8,18 +8,21 @@ import { formatCurrency } from "@/lib/utils";
 import { Star, Heart } from "lucide-react";
 import { useState } from "react";
 import { ProductStatus } from "@/lib/enum";
-import { getProducts } from "@/services/products";
 import { useQuery } from "@tanstack/react-query";
-import { Spinner } from "@/components/ui/spinner";
+import { getProductsByCategoryId } from "@/services/products";
 import PaginationControl from "@/components/pagination-control";
 
-export function ProductsGrid() {
+export default function CategoryProducts({
+  categoryId,
+}: {
+  categoryId: string;
+}) {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [page, setPage] = useState(1);
 
   const { data: paginated, isLoading } = useQuery({
-    queryKey: ["products", page],
-    queryFn: () => getProducts(page, 6),
+    queryKey: ["categoryProducts", categoryId, page],
+    queryFn: () => getProductsByCategoryId(categoryId, page, 6),
     staleTime: Infinity,
   });
 
@@ -31,13 +34,7 @@ export function ProductsGrid() {
     );
   };
 
-  if (isLoading)
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Spinner />
-      </div>
-    );
-
+  if (isLoading) return <div>Loading...</div>;
   if (paginated?.data.length === 0 || !paginated)
     return <div>Không có sản phẩm nào.</div>;
 

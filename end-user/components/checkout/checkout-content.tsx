@@ -27,6 +27,7 @@ import { getCurrentUser } from "@/services/auth";
 import { clearCart } from "@/services/cart";
 import { CustomerInfo, customerInfoSchema } from "@/lib/validations";
 import { checkoutByCard } from "@/services/payment";
+import { checkoutByCash } from "@/services/payment";
 
 export function CheckoutContent() {
   const router = useRouter();
@@ -73,9 +74,16 @@ export function CheckoutContent() {
         const response = await checkoutByCard({ address: data.address });
         router.push(response.url);
       } else if (data.paymentMethod === PaymentMethod.CASH) {
+        const response = await checkoutByCash({ address: data.address });
         toast.success(
-          "Đặt thuê thành công! Vui lòng chuẩn bị tiền mặt khi nhận hàng."
+          response.message ||
+            "Đặt thuê thành công! Vui lòng chuẩn bị tiền mặt khi nhận hàng."
         );
+        if (response.order_id) {
+          router.push(`/orders/${response.order_id}`);
+        } else {
+          router.push("/orders");
+        }
       } else if (data.paymentMethod === PaymentMethod.BANK_TRANSFER) {
         toast.success(
           "Tính năng đang được phát triển. Vui lòng chọn phương thức khác."

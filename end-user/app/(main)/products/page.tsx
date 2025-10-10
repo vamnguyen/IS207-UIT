@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 
 export default async function ProductsPage() {
   const categories = await getCategories();
-  const products = await getProducts();
+  const paginated = await getProducts();
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <ProductsHeader />
+        <ProductsHeader per_page={paginated.per_page} total={paginated.total} />
 
         <div className="grid lg:grid-cols-4 gap-8">
           <div className="lg:col-span-1">
@@ -24,7 +24,7 @@ export default async function ProductsPage() {
           </div>
 
           <div className="lg:col-span-3">
-            <ProductsGrid products={products} />
+            <ProductsGrid />
           </div>
         </div>
       </div>
