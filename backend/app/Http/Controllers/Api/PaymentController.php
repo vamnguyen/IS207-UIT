@@ -147,4 +147,71 @@ class PaymentController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+
+    /**
+     * Thanh toán bằng tiền mặt (không qua Stripe)
+     */
+    public function checkoutCash(Request $request)
+    {
+        $validated = $request->validate([
+            'address' => 'required|string|max:255',
+        ]);
+
+        $user = $request->user();
+
+        // Lấy toàn bộ cart items của user
+        $cartItems = CartItem::whereHas('cart', fn($q) => $q->where('user_id', $user->id))
+            ->with('product')
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return response()->json(['message' => 'Giỏ hàng trống.'], 400);
+        }
+
+        // Tính tổng tiền (VND)
+        $totalAmount = $cartItems->sum('total_price');
+
+        DB::beginTransaction();
+        try {
+            // Tạo đơn hàng (confirmed ngay vì chọn thanh toán khi nhận hàng)
+            $order = Order::create([
+                'user_id' => $user->id,
+                'start_date' => $cartItems->min('start_date'),
+                'end_date' => $cartItems->max('end_date'),
+                'total_amount' => $totalAmount,
+                'status' => 'confirmed',
+                'address' => $validated['address'],
+            ]);
+
+            // Lưu từng sản phẩm vào order_items
+            foreach ($cartItems as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'price' => $item->product->price ?? 0,
+                    'days' => $item->days,
+                    'subtotal' => $item->total_price,
+                ]);
+            }
+
+            // Tạo bản ghi payment (completed = pending? For cash we'll mark pending or completed depending business rule)
+            $payment = Payment::create([
+                'order_id' => $order->id,
+                'payment_method' => 'cash',
+                'amount' => $totalAmount,
+                'status' => 'pending',
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Đặt hàng thành công. Vui lòng chuẩn bị tiền mặt khi nhận hàng.',
+                'order_id' => $order->id,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
