@@ -12,18 +12,18 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     && docker-php-ext-install pdo pdo_mysql zip bcmath
 
-# 3️⃣ Copy composer files trước (tận dụng cache)
-COPY composer.json composer.lock ./
-
-# 4️⃣ Cài Composer
+# 3️⃣ Cài Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# 5️⃣ Cache Composer dependencies
+# 4️⃣ Copy toàn bộ source code trước để artisan có sẵn
+COPY . .
+
+# 5️⃣ Cho phép Composer chạy với quyền root (Render chạy root)
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# 6️⃣ Cache Composer dependencies
 RUN --mount=type=cache,target=/root/.composer \
     composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-
-# 6️⃣ Copy toàn bộ source code vào container
-COPY . .
 
 # 7️⃣ Set quyền cho storage & cache
 RUN chmod -R 775 storage bootstrap/cache
