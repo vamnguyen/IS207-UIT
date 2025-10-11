@@ -25,8 +25,7 @@ export async function generateMetadata({
   return {
     title: `${product.name}`,
     description:
-      product.description ||
-      `Thuê ${product.name} với giá tốt nhất tại RentHub`,
+      product.description || `Thuê ${product.name} với giá tốt nhất tại ReRent`,
   };
 }
 

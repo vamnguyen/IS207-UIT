@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DetailsOrderClient } from "./client-page";
 
 export const metadata: Metadata = {
-  title: "Chi tiết đơn hàng | RentHub",
+  title: "Chi tiết đơn hàng | ReRent",
   description: "Xem chi tiết đơn hàng thuê",
 };
 

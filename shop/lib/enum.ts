@@ -29,3 +29,8 @@ export enum PaymentStatus {
   COMPLETED = "completed",
   FAILED = "failed",
 }
+
+export enum UploadFolder {
+  PRODUCT_IMAGES = "product-images",
+  CATEGORY_IMAGES = "category-images",
+}

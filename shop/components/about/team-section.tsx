@@ -7,93 +7,90 @@ import { Button } from "@/components/ui/button";
 const teamMembers = [
   {
     id: 1,
-    name: "Nguyễn Văn An",
-    role: "CEO & Founder",
+    name: "Trần Ngọc Quỳnh Hoa",
+    role: "Co-founder",
     image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/professional-asian-male-ceo-4KkMpPLjSOMAVGnbB8QBHCtumXIzuv.jpg",
+      "https://com62647.wordpress.com/wp-content/uploads/2025/10/z7068339402421_513246101948e5f7eda204c8a33cb454-1-edited.jpg",
     bio: "10 năm kinh nghiệm trong lĩnh vực công nghệ và kinh doanh",
     social: {
       linkedin: "#",
       github: "#",
-      email: "an@renthub.vn",
+      email: "hoa.tran@rerent.vn",
     },
   },
   {
     id: 2,
-    name: "Trần Thị Bình",
-    role: "CTO",
+    name: "Nguyễn Bảo Như",
+    role: "Co-founder",
     image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/professional-asian-female-developer-lw152KPHzIk5rRY8xkxeFsoKmSEN9A.jpg",
+      "https://com62647.wordpress.com/wp-content/uploads/2025/10/z7069773343973_f08fd198d00e041c51840f24f782c74f-1-edited.jpg",
     bio: "Chuyên gia về kiến trúc hệ thống và phát triển phần mềm",
     social: {
       linkedin: "#",
       github: "#",
-      email: "binh@renthub.vn",
+      email: "nhu.nguyen@rerent.vn",
     },
   },
   {
     id: 3,
-    name: "Lê Minh Cường",
-    role: "Lead Developer",
+    name: "Huỳnh Lâm Tâm Như",
+    role: "Co-founder",
     image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/professional-asian-male-developer-6asnyIvOdybDFlfjnAiL230jNzwSr7.jpg",
+      "https://com62647.wordpress.com/wp-content/uploads/2025/10/z7068227179672_8ff50be645ed46ba464f37af7d5f044b-edited.jpg",
     bio: "Đam mê xây dựng trải nghiệm người dùng tuyệt vời",
     social: {
       linkedin: "#",
       github: "#",
-      email: "cuong@renthub.vn",
+      email: "nhu.huynh@rerent.vn",
     },
   },
   {
     id: 4,
-    name: "Phạm Thu Dung",
-    role: "Product Manager",
+    name: "Nguyễn Minh Long",
+    role: "Co-founder",
     image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/professional-asian-female-manager-7KMIyKWgq2Tg3eSTJKP4YCr3gV4Q5f.jpg",
+      "https://com62647.wordpress.com/wp-content/uploads/2025/10/z7068216645955_923f9efc4ba9140a0f3d1b2440b610c6-edited.jpg",
     bio: "Chuyên gia về quản lý sản phẩm và chiến lược kinh doanh",
     social: {
       linkedin: "#",
       github: "#",
-      email: "dung@renthub.vn",
+      email: "long.nguyen@rerent.vn",
     },
   },
   {
     id: 5,
-    name: "Hoàng Văn Em",
-    role: "UI/UX Designer",
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/professional-asian-male-designer-MoJSUiYRSeoBUZ5Mdy2FrRTX7slSg1.jpg",
+    name: "Nguyễn Viết Anh Minh",
+    role: "Co-founder",
+    image: "https://avatars.githubusercontent.com/u/120087002?v=4",
     bio: "Tạo ra những thiết kế đẹp mắt và dễ sử dụng",
     social: {
       linkedin: "#",
       github: "#",
-      email: "em@renthub.vn",
+      email: "minh.nguyen@rerent.vn",
     },
   },
   {
     id: 6,
-    name: "Đỗ Thị Phương",
-    role: "Marketing Lead",
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/professional-asian-female-marketing-Pz9WioW4eRPJqcMR4vw8AJ2R01qFH4.jpg",
+    name: "Tô Hoàng Nhật",
+    role: "Co-founder",
+    image: "https://avatars.githubusercontent.com/u/145257227?v=4",
     bio: "Chuyên gia về marketing số và phát triển thương hiệu",
     social: {
       linkedin: "#",
       github: "#",
-      email: "phuong@renthub.vn",
+      email: "nhat.to@rerent.vn",
     },
   },
   {
     id: 7,
-    name: "Vũ Đức Giang",
-    role: "Customer Success",
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/attachments/gen-images/public/professional-asian-male-support-lFKzAex6d3UpZAqAIt1lnmm49HthXc.jpg",
+    name: "Đinh Khánh Đăng",
+    role: "Co-founder",
+    image: "https://avatars.githubusercontent.com/u/157336690?v=4",
     bio: "Đảm bảo trải nghiệm khách hàng luôn hoàn hảo",
     social: {
       linkedin: "#",
       github: "#",
-      email: "giang@renthub.vn",
+      email: "dang.dinh@rerent.vn",
     },
   },
 ];

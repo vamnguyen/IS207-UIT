@@ -14,7 +14,7 @@ export default function LoginPage() {
           <div className="text-center space-y-2">
             <h1 className="text-2xl font-bold text-balance">Đăng nhập</h1>
             <p className="text-muted-foreground text-pretty">
-              Chào mừng bạn quay trở lại với RentHub
+              Chào mừng bạn quay trở lại với ReRent
             </p>
           </div>
           <LoginForm />

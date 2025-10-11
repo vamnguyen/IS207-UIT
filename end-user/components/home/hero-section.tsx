@@ -59,7 +59,7 @@ export function HeroSection() {
             <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 p-8">
               <img
                 src="https://images.deepai.org/machine-learning-models/d4b1dd3ee43648a997650dc7f9e6923f/panda.jpeg"
-                alt="RentHub Platform"
+                alt="ReRent Platform"
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />
 

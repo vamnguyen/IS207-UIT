@@ -17,11 +17,17 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "@/services/auth";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Logo from "@/public/logo.png";
 
 const navItems = [
   {
     label: "Sản phẩm của tôi",
     href: "/my-products",
+  },
+  {
+    label: "Giới thiệu",
+    href: "/about",
   },
 ];
 
@@ -33,7 +39,7 @@ export function AppHeader() {
   const { data: user } = useQuery({
     queryKey: ["user"],
     queryFn: getCurrentUser,
-    enabled: !!Cookies.get("auth_token"), // Chỉ chạy khi có auth_token
+    enabled: !!Cookies.get("auth_token"),
     staleTime: Infinity,
   });
 
@@ -52,12 +58,13 @@ export function AppHeader() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">
-                R
-              </span>
-            </div>
-            <span className="font-bold text-xl">RentHub</span>
+            <Image
+              src={Logo}
+              alt="Logo"
+              width={60}
+              height={60}
+              className="aspect-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}

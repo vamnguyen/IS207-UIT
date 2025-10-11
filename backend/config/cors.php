@@ -6,7 +6,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000', 'https://rerent-three.vercel.app'], // Next.js URL
+    'allowed_origins' => ['http://localhost:3000', 'http://localhost:3001', 'https://rerent-three.vercel.app'], // Next.js URL
 
     'allowed_origins_patterns' => [],
 

@@ -7,6 +7,8 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import Image from "next/image";
+import Logo from "@/public/logo.png";
 
 export function Footer() {
   return (
@@ -15,14 +17,15 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">
-                  R
-                </span>
-              </div>
-              <span className="font-bold text-xl">RentHub</span>
-            </div>
+            <Link href="/" className="flex items-center space-x-2">
+              <Image
+                src={Logo}
+                alt="Logo"
+                width={60}
+                height={60}
+                className="aspect-auto"
+              />
+            </Link>
             <p className="text-sm text-muted-foreground">
               Nền tảng cho thuê đồ dùng hàng đầu Việt Nam. Thuê dễ dàng, trả
               nhanh chóng, giá cả hợp lý.
@@ -137,7 +140,7 @@ export function Footer() {
               </li>
               <li className="flex items-center space-x-2 text-muted-foreground">
                 <Mail className="h-4 w-4" />
-                <span>support@renthub.vn</span>
+                <span>support@rerent.vn</span>
               </li>
               <li className="flex items-center space-x-2 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
@@ -148,7 +151,7 @@ export function Footer() {
         </div>
 
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 RentHub. Tất cả quyền được bảo lưu.</p>
+          <p>&copy; 2025 ReRent. Tất cả quyền được bảo lưu.</p>
         </div>
       </div>
     </footer>

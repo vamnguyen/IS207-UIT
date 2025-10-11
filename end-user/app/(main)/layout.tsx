@@ -5,8 +5,8 @@ import { Footer } from "@/components/layout/footer";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | RentHub",
-    absolute: "RentHub Việt Nam | Thuê đồ online dễ dàng",
+    template: "%s | ReRent",
+    absolute: "ReRent Việt Nam | Thuê đồ online dễ dàng",
   },
 };
 

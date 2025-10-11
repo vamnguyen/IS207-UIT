@@ -34,7 +34,7 @@ export function StatsSection() {
       <div className="container mx-auto px-4">
         <div className="text-center space-y-4 mb-12">
           <h2 className="text-3xl lg:text-4xl font-bold text-balance">
-            Tại sao chọn RentHub?
+            Tại sao chọn ReRent?
           </h2>
           <p className="text-lg text-muted-foreground text-pretty max-w-2xl mx-auto">
             Chúng tôi cam kết mang đến trải nghiệm thuê đồ tốt nhất với dịch vụ

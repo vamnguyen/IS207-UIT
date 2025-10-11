@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import Cookies from "js-cookie";
 import { ShoppingCart, UserIcon, Search, Menu, LogOut } from "lucide-react";
 import { useState } from "react";
@@ -19,6 +20,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser, logout } from "@/services/auth";
 import { useRouter } from "next/navigation";
 import { useGetCart } from "@/hooks/use-cart";
+import Logo from "@/public/logo.png";
 
 const navItems = [
   {
@@ -44,7 +46,7 @@ export function AppHeader() {
   const { data: user } = useQuery({
     queryKey: ["user"],
     queryFn: getCurrentUser,
-    enabled: !!Cookies.get("auth_token"), // Chỉ chạy khi có auth_token
+    enabled: !!Cookies.get("auth_token"),
     staleTime: Infinity,
   });
 
@@ -65,12 +67,13 @@ export function AppHeader() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">
-                R
-              </span>
-            </div>
-            <span className="font-bold text-xl">RentHub</span>
+            <Image
+              src={Logo}
+              alt="Logo"
+              width={60}
+              height={60}
+              className="aspect-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}

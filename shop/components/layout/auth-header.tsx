@@ -12,7 +12,7 @@ export function AuthHeader() {
                 R
               </span>
             </div>
-            <span className="font-bold text-xl">RentHub</span>
+            <span className="font-bold text-xl">ReRent</span>
           </Link>
         </div>
       </div>
