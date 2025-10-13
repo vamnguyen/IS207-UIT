@@ -71,8 +71,9 @@ class ProductController extends Controller
     {
         $user = $request->user();
 
-        $request->validate([
+        $validatedData = $request->validate([
             'name'        => 'required|string|max:255',
+            'slug'        => 'nullable|string|max:255|unique:products,slug',
             'description' => 'nullable|string',
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
@@ -84,7 +85,7 @@ class ProductController extends Controller
         try {
             $product = Product::create([
                 'name'        => $request->name,
-                'slug'        => Str::slug($request->name),
+                'slug'        => $validatedData['slug'] ?? Str::slug($request->name),
                 'description' => $request->description,
                 'price'       => $request->price,
                 'stock'       => $request->stock,

@@ -2,11 +2,25 @@ import axiosInstance from "@/lib/axiosInstance";
 import type { PaginatedResponse } from "@/lib/response";
 import type { User } from "@/lib/types";
 
-export const getAdminUsers = async (page = 1, per_page = 20) => {
+export const getAdminUsers = async (
+  page = 1,
+  per_page = 20
+): Promise<PaginatedResponse<User>> => {
   const res = await axiosInstance.get(
     `${process.env.NEXT_PUBLIC_API_URL}/admin/users?page=${page}&per_page=${per_page}`
   );
-  return res.data as PaginatedResponse<User>;
+  return res.data;
+};
+
+export const getAdminUsersByRole = async (
+  role: string,
+  page = 1,
+  per_page = 20
+): Promise<User[]> => {
+  const res = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/admin/users/role/${role}?page=${page}&per_page=${per_page}`
+  );
+  return res.data.data;
 };
 
 export const updateUserRole = async (id: number, role: string) => {

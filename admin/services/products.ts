@@ -51,3 +51,26 @@ export const getProductsByCategoryId = async (
   );
   return response.data;
 };
+
+export const createProduct = async (data: Partial<Product>) => {
+  const response = await axiosInstance.post(
+    `${process.env.NEXT_PUBLIC_API_URL}/products`,
+    data
+  );
+  return response.data;
+};
+
+export const updateProduct = async (id: number, data: Partial<Product>) => {
+  const response = await axiosInstance.put(
+    `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
+    data
+  );
+  return response.data;
+};
+
+export const deleteProduct = async (id: number) => {
+  const response = await axiosInstance.delete(
+    `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`
+  );
+  return response.data;
+};

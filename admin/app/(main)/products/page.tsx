@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,134 +21,51 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Plus, Pencil, Trash2, Eye, ImageIcon } from "lucide-react";
-import type { Product, Category, User } from "@/lib/types";
-import { ProductStatus, Role } from "@/lib/enum";
+import type { Product } from "@/lib/types";
+import { ProductStatus } from "@/lib/enum";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Image from "next/image";
-
-// Mock data
-const mockCategories: Category[] = [
-  {
-    id: 1,
-    name: "Điện tử",
-    slug: "dien-tu",
-    created_at: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: 2,
-    name: "Thời trang",
-    slug: "thoi-trang",
-    created_at: "2024-02-20T14:20:00Z",
-  },
-  {
-    id: 3,
-    name: "Gia dụng",
-    slug: "gia-dung",
-    created_at: "2024-03-10T09:15:00Z",
-  },
-];
-
-const mockShops: User[] = [
-  {
-    id: 2,
-    name: "Cửa hàng A",
-    email: "shopa@example.com",
-    role: Role.SHOP,
-    address: null,
-    avatar_url: null,
-    created_at: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: 3,
-    name: "Cửa hàng B",
-    email: "shopb@example.com",
-    role: Role.SHOP,
-    address: null,
-    avatar_url: null,
-    created_at: "2024-02-20T14:20:00Z",
-  },
-];
-
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    name: "Laptop Dell XPS 15",
-    slug: "laptop-dell-xps-15",
-    description: "Laptop cao cấp cho doanh nhân",
-    price: 35000000,
-    stock: 10,
-    image_url: "/laptop-dell-xps.png",
-    images: ["/laptop-dell-xps.png"],
-    status: ProductStatus.IN_STOCK,
-    category_id: 1,
-    category: mockCategories[0],
-    shop_id: 2,
-    shop: mockShops[0],
-    created_at: "2024-01-15T10:30:00Z",
-    updated_at: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: 2,
-    name: "Áo thun nam",
-    slug: "ao-thun-nam",
-    description: "Áo thun cotton cao cấp",
-    price: 250000,
-    stock: 50,
-    image_url: "/mens-tshirt.png",
-    images: ["/mens-tshirt.png"],
-    status: ProductStatus.IN_STOCK,
-    category_id: 2,
-    category: mockCategories[1],
-    shop_id: 3,
-    shop: mockShops[1],
-    created_at: "2024-02-20T14:20:00Z",
-    updated_at: "2024-02-20T14:20:00Z",
-  },
-];
+import { toast } from "sonner";
+import { getProducts, deleteProduct } from "@/services/products";
+import ProductFormDialog from "@/components/products/product-form-dialog";
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const qc = useQueryClient();
+  const [page, setPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
-    description: "",
-    price: "",
-    stock: "",
-    image_url: "",
-    status: ProductStatus.IN_STOCK,
-    category_id: "",
-    shop_id: "",
+  const { data: paginated } = useQuery({
+    queryKey: ["products", page],
+    queryFn: () => getProducts(page, 12),
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      slug: "",
-      description: "",
-      price: "",
-      stock: "",
-      image_url: "",
-      status: ProductStatus.IN_STOCK,
-      category_id: "",
-      shop_id: "",
-    });
+  const products: Product[] =
+    paginated && Array.isArray(paginated.data) ? paginated.data : [];
+
+  const deleteMut = useMutation({
+    mutationFn: (id: number) => deleteProduct(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Xoá sản phẩm thành công");
+    },
+  });
+
+  const handleCreate = () => {
+    setSelectedProduct(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEdit = (product: Product) => {
+    setSelectedProduct(product);
+    setIsFormOpen(true);
   };
 
   const handleView = (product: Product) => {
@@ -155,97 +73,14 @@ export default function ProductsPage() {
     setIsViewDialogOpen(true);
   };
 
-  const handleCreate = () => {
-    resetForm();
-    setIsCreateDialogOpen(true);
-  };
-
-  const handleEdit = (product: Product) => {
-    setSelectedProduct(product);
-    setFormData({
-      name: product.name,
-      slug: product.slug,
-      description: product.description,
-      price: product.price.toString(),
-      stock: product.stock.toString(),
-      image_url: product.image_url || "",
-      status: product.status,
-      category_id: product.category_id.toString(),
-      shop_id: product.shop_id.toString(),
-    });
-    setIsEditDialogOpen(true);
-  };
-
   const handleDelete = (product: Product) => {
     setSelectedProduct(product);
     setIsDeleteDialogOpen(true);
   };
 
-  const confirmCreate = () => {
-    const category = mockCategories.find(
-      (c) => c.id === Number(formData.category_id)
-    );
-    const shop = mockShops.find((s) => s.id === Number(formData.shop_id));
-
-    const newProduct: Product = {
-      id: Math.max(...products.map((p) => p.id)) + 1,
-      name: formData.name,
-      slug: formData.slug,
-      description: formData.description,
-      price: Number(formData.price),
-      stock: Number(formData.stock),
-      image_url: formData.image_url,
-      images: formData.image_url ? [formData.image_url] : [],
-      status: formData.status,
-      category_id: Number(formData.category_id),
-      category,
-      shop_id: Number(formData.shop_id),
-      shop,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    setProducts([...products, newProduct]);
-    setIsCreateDialogOpen(false);
-    resetForm();
-  };
-
-  const confirmEdit = () => {
-    if (selectedProduct) {
-      const category = mockCategories.find(
-        (c) => c.id === Number(formData.category_id)
-      );
-      const shop = mockShops.find((s) => s.id === Number(formData.shop_id));
-
-      setProducts(
-        products.map((p) =>
-          p.id === selectedProduct.id
-            ? {
-                ...p,
-                name: formData.name,
-                slug: formData.slug,
-                description: formData.description,
-                price: Number(formData.price),
-                stock: Number(formData.stock),
-                image_url: formData.image_url,
-                images: formData.image_url ? [formData.image_url] : [],
-                status: formData.status,
-                category_id: Number(formData.category_id),
-                category,
-                shop_id: Number(formData.shop_id),
-                shop,
-                updated_at: new Date().toISOString(),
-              }
-            : p
-        )
-      );
-      setIsEditDialogOpen(false);
-      resetForm();
-    }
-  };
-
   const confirmDelete = () => {
     if (selectedProduct) {
-      setProducts(products.filter((p) => p.id !== selectedProduct.id));
+      deleteMut.mutate(selectedProduct.id);
       setIsDeleteDialogOpen(false);
     }
   };
@@ -262,151 +97,6 @@ export default function ProductsPage() {
         return "outline";
     }
   };
-
-  const ProductForm = () => (
-    <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="name">Tên sản phẩm *</Label>
-          <Input
-            id="name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="Nhập tên sản phẩm"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="slug">Slug *</Label>
-          <Input
-            id="slug"
-            value={formData.slug}
-            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-            placeholder="ten-san-pham"
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="description">Mô tả *</Label>
-        <Textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-          placeholder="Mô tả sản phẩm"
-          rows={3}
-        />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="price">Giá (VND) *</Label>
-          <Input
-            id="price"
-            type="number"
-            value={formData.price}
-            onChange={(e) =>
-              setFormData({ ...formData, price: e.target.value })
-            }
-            placeholder="0"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="stock">Số lượng *</Label>
-          <Input
-            id="stock"
-            type="number"
-            value={formData.stock}
-            onChange={(e) =>
-              setFormData({ ...formData, stock: e.target.value })
-            }
-            placeholder="0"
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="category">Danh mục *</Label>
-          <Select
-            value={formData.category_id}
-            onValueChange={(value) =>
-              setFormData({ ...formData, category_id: value })
-            }
-          >
-            <SelectTrigger id="category">
-              <SelectValue placeholder="Chọn danh mục" />
-            </SelectTrigger>
-            <SelectContent>
-              {mockCategories.map((category) => (
-                <SelectItem key={category.id} value={category.id.toString()}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="shop">Cửa hàng *</Label>
-          <Select
-            value={formData.shop_id}
-            onValueChange={(value) =>
-              setFormData({ ...formData, shop_id: value })
-            }
-          >
-            <SelectTrigger id="shop">
-              <SelectValue placeholder="Chọn cửa hàng" />
-            </SelectTrigger>
-            <SelectContent>
-              {mockShops.map((shop) => (
-                <SelectItem key={shop.id} value={shop.id.toString()}>
-                  {shop.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="status">Trạng thái *</Label>
-        <Select
-          value={formData.status}
-          onValueChange={(value) =>
-            setFormData({ ...formData, status: value as ProductStatus })
-          }
-        >
-          <SelectTrigger id="status">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ProductStatus.IN_STOCK}>
-              {ProductStatus.IN_STOCK}
-            </SelectItem>
-            <SelectItem value={ProductStatus.RENTING}>
-              {ProductStatus.RENTING}
-            </SelectItem>
-            <SelectItem value={ProductStatus.MAINTENANCE}>
-              {ProductStatus.MAINTENANCE}
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="image_url">URL hình ảnh</Label>
-        <Input
-          id="image_url"
-          value={formData.image_url}
-          onChange={(e) =>
-            setFormData({ ...formData, image_url: e.target.value })
-          }
-          placeholder="https://example.com/image.jpg"
-        />
-      </div>
-    </div>
-  );
 
   return (
     <div className="space-y-6">
@@ -453,6 +143,7 @@ export default function ProductsPage() {
                           src={product.image_url || "/placeholder.svg"}
                           alt={product.name}
                           fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           className="object-cover"
                         />
                       ) : (
@@ -506,7 +197,7 @@ export default function ProductsPage() {
 
       {/* View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl" aria-describedby="view-product">
           <DialogHeader>
             <DialogTitle>Chi tiết sản phẩm</DialogTitle>
           </DialogHeader>
@@ -586,51 +277,16 @@ export default function ProductsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Create Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Thêm sản phẩm mới</DialogTitle>
-            <DialogDescription>
-              Tạo sản phẩm mới trong hệ thống
-            </DialogDescription>
-          </DialogHeader>
-          <ProductForm />
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsCreateDialogOpen(false)}
-            >
-              Hủy
-            </Button>
-            <Button onClick={confirmCreate}>Tạo sản phẩm</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Chỉnh sửa sản phẩm</DialogTitle>
-            <DialogDescription>Cập nhật thông tin sản phẩm</DialogDescription>
-          </DialogHeader>
-          <ProductForm />
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsEditDialogOpen(false)}
-            >
-              Hủy
-            </Button>
-            <Button onClick={confirmEdit}>Lưu thay đổi</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Create/Edit Dialog */}
+      <ProductFormDialog
+        open={isFormOpen}
+        setOpen={setIsFormOpen}
+        product={selectedProduct}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg" aria-describedby="delete-product">
           <DialogHeader>
             <DialogTitle>Xác nhận xóa</DialogTitle>
             <DialogDescription>

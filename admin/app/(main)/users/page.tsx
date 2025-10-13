@@ -67,7 +67,7 @@ export default function UsersPage() {
     },
   });
 
-  const users = (usersPage?.data ?? []) as User[];
+  const users = usersPage?.data ?? [];
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

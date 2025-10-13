@@ -138,7 +138,9 @@ export default function ClientMyProductsPage() {
 
   const openCreate = () => {
     setEditing(null);
-    methods.reset({});
+    methods.reset({
+      name: "",
+    });
     setAttachments([]);
     setOpen(true);
   };
@@ -149,24 +151,6 @@ export default function ClientMyProductsPage() {
     setAttachments(p.images || []);
     setOpen(true);
   };
-
-  // Ensure when dialog opens we set the proper form values (create vs edit)
-  useEffect(() => {
-    if (open) {
-      if (editing) {
-        methods.reset(editing);
-        setAttachments(editing.images || []);
-      } else {
-        methods.reset({});
-        setAttachments([]);
-      }
-    }
-    // when dialog closes we keep editing cleared so subsequent opens start fresh
-    if (!open) {
-      setEditing(null);
-    }
-    // only run when open or editing changes
-  }, [open, editing]);
 
   const onSubmit = (values: Partial<Product>) => {
     const payload = { ...values };

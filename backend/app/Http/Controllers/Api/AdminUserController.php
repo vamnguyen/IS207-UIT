@@ -18,6 +18,14 @@ class AdminUserController extends Controller
         return response()->json($users);
     }
 
+    // GET users by role /api/admin/users/role/{role}
+    public function getByRole(Request $request, $role)
+    {
+        $perPage = (int) $request->query('per_page', 20);
+        $users = User::where('role', $role)->orderBy('id', 'desc')->paginate($perPage);
+        return response()->json($users);
+    }
+
     // PUT /api/admin/users/{id}/role
     public function updateRole(Request $request, $id)
     {
