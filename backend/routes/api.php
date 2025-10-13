@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\UploadController;
+use App\Http\Controllers\Api\AdminDashboardController;
 
 // ========================== Public routes ==========================
 // 1. Auth & User
@@ -73,4 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // 9. Orders
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
+
+    // 10. Admin dashboard
+    Route::middleware('role:admin')->get('/admin/dashboard', [AdminDashboardController::class, 'index']);
 });
