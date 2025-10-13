@@ -76,5 +76,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders/{id}', [OrderController::class, 'show']);
 
     // 10. Admin dashboard
-    Route::middleware('role:admin')->get('/admin/dashboard', [AdminDashboardController::class, 'index']);
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/admin/dashboard', [AdminDashboardController::class, 'index']);
+
+        Route::get('/admin/users', [\App\Http\Controllers\Api\AdminUserController::class, 'index']);
+        Route::put('/admin/users/{id}/role', [\App\Http\Controllers\Api\AdminUserController::class, 'updateRole']);
+        Route::delete('/admin/users/{id}', [\App\Http\Controllers\Api\AdminUserController::class, 'destroy']);
+    });
 });

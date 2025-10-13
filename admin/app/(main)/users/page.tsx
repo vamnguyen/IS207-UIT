@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getAdminUsers, updateUserRole, deleteUser } from "@/services/users";
+import type { PaginatedResponse } from "@/lib/response";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,39 +37,37 @@ import type { User } from "@/lib/types";
 import { Role } from "@/lib/enum";
 import { formatDate, getInitials } from "@/lib/utils";
 
-// Mock data - replace with actual API calls
-const mockUsers: User[] = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    email: "nguyenvana@example.com",
-    role: Role.ADMIN,
-    address: "123 Đường ABC, Quận 1, TP.HCM",
-    avatar_url: null,
-    created_at: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: 2,
-    name: "Trần Thị B",
-    email: "tranthib@example.com",
-    role: Role.SHOP,
-    address: "456 Đường XYZ, Quận 2, TP.HCM",
-    avatar_url: null,
-    created_at: "2024-02-20T14:20:00Z",
-  },
-  {
-    id: 3,
-    name: "Lê Văn C",
-    email: "levanc@example.com",
-    role: Role.CUSTOMER,
-    address: "789 Đường DEF, Quận 3, TP.HCM",
-    avatar_url: null,
-    created_at: "2024-03-10T09:15:00Z",
-  },
-];
-
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [page, setPage] = useState(1);
+  const queryClient = useQueryClient();
+
+  const { data: usersPage, isLoading } = useQuery<
+    PaginatedResponse<User>,
+    Error
+  >({
+    queryKey: ["adminUsers", page],
+    queryFn: () => getAdminUsers(page, 20),
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const mutateUpdateRole = useMutation({
+    mutationFn: (payload: { id: number; role: string }) =>
+      updateUserRole(payload.id, payload.role),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
+    },
+  });
+
+  const mutateDeleteUser = useMutation({
+    mutationFn: (id: number) => deleteUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
+    },
+  });
+
+  const users = (usersPage?.data ?? []) as User[];
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -91,18 +92,14 @@ export default function UsersPage() {
 
   const confirmEdit = () => {
     if (selectedUser) {
-      setUsers(
-        users.map((u) =>
-          u.id === selectedUser.id ? { ...u, role: editRole } : u
-        )
-      );
+      mutateUpdateRole.mutate({ id: selectedUser.id, role: editRole });
       setIsEditDialogOpen(false);
     }
   };
 
   const confirmDelete = () => {
     if (selectedUser) {
-      setUsers(users.filter((u) => u.id !== selectedUser.id));
+      mutateDeleteUser.mutate(selectedUser.id);
       setIsDeleteDialogOpen(false);
     }
   };
