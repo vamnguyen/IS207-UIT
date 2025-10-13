@@ -1,6 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from "@/services/categories";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -27,36 +34,49 @@ import type { Category } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 
-// Mock data - replace with actual API calls
-const mockCategories: Category[] = [
-  {
-    id: 1,
-    name: "Điện tử",
-    slug: "dien-tu",
-    description: "Các sản phẩm điện tử",
-    image_url: "/electronics-components.png",
-    created_at: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: 2,
-    name: "Thời trang",
-    slug: "thoi-trang",
-    description: "Quần áo và phụ kiện",
-    image_url: "/diverse-fashion-collection.png",
-    created_at: "2024-02-20T14:20:00Z",
-  },
-  {
-    id: 3,
-    name: "Gia dụng",
-    slug: "gia-dung",
-    description: "Đồ dùng gia đình",
-    image_url: "/cozy-cabin-interior.png",
-    created_at: "2024-03-10T09:15:00Z",
-  },
-];
-
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const queryClient = useQueryClient();
+  const { data: categoriesData, isLoading } = useQuery<Category[]>({
+    queryKey: ["categories"],
+    queryFn: () => getCategories(),
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (payload: {
+      name: string;
+      description?: string;
+      image_url?: string;
+    }) => createCategory(payload),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["categories"] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (payload: {
+      id: number;
+      name: string;
+      description?: string;
+      image_url?: string;
+    }) =>
+      updateCategory(payload.id, {
+        name: payload.name,
+        description: payload.description,
+        image_url: payload.image_url,
+      }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["categories"] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteCategory(id),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["categories"] }),
+  });
+
+  const categories = categoriesData ?? [];
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
@@ -102,34 +122,23 @@ export default function CategoriesPage() {
   };
 
   const confirmCreate = () => {
-    const newCategory: Category = {
-      id: Math.max(...categories.map((c) => c.id)) + 1,
+    createMutation.mutate({
       name: formData.name,
-      slug: formData.slug,
       description: formData.description,
       image_url: formData.image_url,
-      created_at: new Date().toISOString(),
-    };
-    setCategories([...categories, newCategory]);
+    });
     setIsCreateDialogOpen(false);
     resetForm();
   };
 
   const confirmEdit = () => {
     if (selectedCategory) {
-      setCategories(
-        categories.map((c) =>
-          c.id === selectedCategory.id
-            ? {
-                ...c,
-                name: formData.name,
-                slug: formData.slug,
-                description: formData.description,
-                image_url: formData.image_url,
-              }
-            : c
-        )
-      );
+      updateMutation.mutate({
+        id: selectedCategory.id,
+        name: formData.name,
+        description: formData.description,
+        image_url: formData.image_url,
+      });
       setIsEditDialogOpen(false);
       resetForm();
     }
@@ -137,7 +146,7 @@ export default function CategoriesPage() {
 
   const confirmDelete = () => {
     if (selectedCategory) {
-      setCategories(categories.filter((c) => c.id !== selectedCategory.id));
+      deleteMutation.mutate(selectedCategory.id);
       setIsDeleteDialogOpen(false);
     }
   };
@@ -151,15 +160,6 @@ export default function CategoriesPage() {
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           placeholder="Nhập tên danh mục"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="slug">Slug *</Label>
-        <Input
-          id="slug"
-          value={formData.slug}
-          onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-          placeholder="ten-danh-muc"
         />
       </div>
       <div className="space-y-2">

@@ -23,7 +23,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useQuery } from "@tanstack/react-query";
-import getAdminDashboard, {
+import {
+  getAdminDashboard,
   type DashboardResponse,
   type OrderStatusPoint,
 } from "@/services/dashboard";

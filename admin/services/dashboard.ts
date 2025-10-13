@@ -26,5 +26,3 @@ export const getAdminDashboard = async (): Promise<DashboardResponse> => {
   );
   return res.data;
 };
-
-export default getAdminDashboard;

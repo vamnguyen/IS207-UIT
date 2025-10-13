@@ -23,5 +23,3 @@ export const deleteUser = async (id: number) => {
   );
   return res.data;
 };
-
-export default { getAdminUsers, updateUserRole, deleteUser };
