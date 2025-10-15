@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,13 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { Order } from "@/lib/types";
-import {
-  OrderStatus,
-  PaymentMethod,
-  PaymentStatus,
-  ProductStatus,
-  Role,
-} from "@/lib/enum";
+import { OrderStatus } from "@/lib/enum";
 import {
   formatCurrency,
   formatDate,
@@ -38,141 +33,77 @@ import {
   paymentStatusConfig,
 } from "@/lib/utils";
 import Image from "next/image";
-
-// Mock data
-const mockOrders: Order[] = [
-  {
-    id: 1,
-    user_id: 1,
-    user: {
-      id: 1,
-      name: "Nguyễn Văn A",
-      email: "nguyenvana@example.com",
-      role: Role.CUSTOMER,
-      address: "123 Đường ABC, Quận 1, TP.HCM",
-      avatar_url: null,
-      created_at: "2024-01-15T10:30:00Z",
-    },
-    start_date: "2024-03-01",
-    end_date: "2024-03-05",
-    total_amount: "5000000",
-    status: OrderStatus.PENDING,
-    address: "123 Đường ABC, Quận 1, TP.HCM",
-    created_at: "2024-02-25T10:30:00Z",
-    updated_at: "2024-02-25T10:30:00Z",
-    items: [
-      {
-        id: 1,
-        order_id: 1,
-        product_id: 1,
-        product: {
-          id: 1,
-          name: "Laptop Dell XPS 15",
-          slug: "laptop-dell-xps-15",
-          description: "Laptop cao cấp",
-          price: 35000000,
-          stock: 10,
-          image_url: "/laptop-dell-xps.png",
-          status: ProductStatus.IN_STOCK,
-          category_id: 1,
-          shop_id: 2,
-          created_at: "2024-01-15T10:30:00Z",
-          updated_at: "2024-01-15T10:30:00Z",
-        },
-        quantity: 1,
-        price: "1000000",
-        days: 5,
-        subtotal: "5000000",
-        created_at: "2024-02-25T10:30:00Z",
-        updated_at: "2024-02-25T10:30:00Z",
-      },
-    ],
-    payment: {
-      id: 1,
-      order_id: 1,
-      payment_method: PaymentMethod.BANK_TRANSFER,
-      amount: "5000000",
-      status: PaymentStatus.PENDING,
-      created_at: "2024-02-25T10:30:00Z",
-      updated_at: "2024-02-25T10:30:00Z",
-    },
-  },
-  {
-    id: 2,
-    user_id: 2,
-    user: {
-      id: 2,
-      name: "Trần Thị B",
-      email: "tranthib@example.com",
-      role: Role.CUSTOMER,
-      address: "456 Đường XYZ, Quận 2, TP.HCM",
-      avatar_url: null,
-      created_at: "2024-02-20T14:20:00Z",
-    },
-    start_date: "2024-03-10",
-    end_date: "2024-03-12",
-    total_amount: "500000",
-    status: OrderStatus.CONFIRMED,
-    address: "456 Đường XYZ, Quận 2, TP.HCM",
-    created_at: "2024-03-05T14:20:00Z",
-    updated_at: "2024-03-06T09:15:00Z",
-    items: [
-      {
-        id: 2,
-        order_id: 2,
-        product_id: 2,
-        product: {
-          id: 2,
-          name: "Áo thun nam",
-          slug: "ao-thun-nam",
-          description: "Áo thun cotton",
-          price: 250000,
-          stock: 50,
-          image_url: "/mens-tshirt.png",
-          status: ProductStatus.IN_STOCK,
-          category_id: 2,
-          shop_id: 3,
-          created_at: "2024-02-20T14:20:00Z",
-          updated_at: "2024-02-20T14:20:00Z",
-        },
-        quantity: 2,
-        price: "250000",
-        days: 3,
-        subtotal: "500000",
-        created_at: "2024-03-05T14:20:00Z",
-        updated_at: "2024-03-05T14:20:00Z",
-      },
-    ],
-    payment: {
-      id: 2,
-      order_id: 2,
-      payment_method: PaymentMethod.CASH,
-      amount: "500000",
-      status: PaymentStatus.COMPLETED,
-      created_at: "2024-03-05T14:20:00Z",
-      updated_at: "2024-03-06T09:15:00Z",
-    },
-  },
-];
+import { getAllOrdersForAdmin, updateOrderStatus } from "@/services/orders";
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const queryClient = useQueryClient();
+
+  const {
+    data: orders = [],
+    isLoading,
+    isError,
+  } = useQuery<Order[]>({
+    queryKey: ["orders"],
+    queryFn: getAllOrdersForAdmin,
+    staleTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
+  const mutation = useMutation({
+    mutationFn: ({ id, status }: { id: number; status: string }) =>
+      updateOrderStatus(id, status),
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ["orders"] });
+
+      const previous = queryClient.getQueryData<Order[]>(["orders"]);
+
+      queryClient.setQueryData<Order[] | undefined>(["orders"], (old) =>
+        old?.map((o) =>
+          o.id === id ? { ...o, status: status as OrderStatus } : o
+        )
+      );
+
+      return { previous };
+    },
+    onError: (err, variables, context: any) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["orders"], context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
   const handleStatusChange = (orderId: number, newStatus: OrderStatus) => {
-    setOrders(
-      orders.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
+    mutation.mutate({ id: orderId, status: newStatus });
   };
 
   const toggleExpand = (orderId: number) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-4">
+        <p>Đang tải đơn hàng...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="p-4">
+        <p className="text-destructive">Lỗi khi tải đơn hàng.</p>
+      </div>
+    );
+  }
 
   const filteredOrders = orders.filter((order) => {
     if (statusFilter !== "all" && order.status !== statusFilter) return false;

@@ -83,5 +83,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/admin/users/{id}/role', [\App\Http\Controllers\Api\AdminUserController::class, 'updateRole']);
         Route::delete('/admin/users/{id}', [\App\Http\Controllers\Api\AdminUserController::class, 'destroy']);
         Route::get('/admin/users/role/{role}', [\App\Http\Controllers\Api\AdminUserController::class, 'getByRole']);
+
+        Route::get('/admin/orders', [OrderController::class, 'getOrdersForAdmin']);
+        Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus']);
     });
 });
