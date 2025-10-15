@@ -4,7 +4,6 @@ import {
   FolderTree,
   Package,
   ShoppingCart,
-  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,7 @@ const navigation = [
   { name: "Danh mục", href: "/categories", icon: FolderTree },
   { name: "Sản phẩm", href: "/products", icon: Package },
   { name: "Đơn hàng", href: "/orders", icon: ShoppingCart },
-  { name: "Bình luận", href: "/comments", icon: MessageSquare },
+  // { name: "Bình luận", href: "/comments", icon: MessageSquare },
 ];
 
 export default function Sidebar() {
