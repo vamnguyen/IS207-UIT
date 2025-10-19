@@ -113,5 +113,6 @@ export type ProductFilters = {
   max_price?: number;
   categories?: number[];
   status?: string[];
+  q?: string;
   sort?: string;
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getCategories } from "@/services/categories";
 import { getProducts } from "@/services/products";
@@ -29,6 +30,7 @@ export default function ClientProductsPage() {
     max_price: MAX_PRICE,
     categories: [],
     status: [],
+    q: undefined,
     sort: undefined,
   });
   const [page, setPage] = useState<number>(1);
@@ -44,6 +46,16 @@ export default function ClientProductsPage() {
     updateFilter("min_price", debouncedPrice[0]);
     updateFilter("max_price", debouncedPrice[1]);
   }, [debouncedPrice]);
+
+  const searchParams = useSearchParams();
+
+  // initialize q from query string
+  useEffect(() => {
+    const q = searchParams?.get("q") || undefined;
+    updateFilter("q", q);
+    // reset to first page when query changes
+    setPage(1);
+  }, [searchParams?.get("q")]);
 
   const updateFilter = <K extends keyof ProductFilters>(
     key: K,

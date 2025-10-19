@@ -41,6 +41,7 @@ const navItems = [
 export function AppHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
@@ -59,6 +60,15 @@ export function AppHeader() {
 
     Cookies.remove("auth_token");
     router.push("/login");
+  };
+
+  const doSearch = () => {
+    const q = (searchText || "").trim();
+    if (q.length === 0) {
+      router.push(`/products`);
+    } else {
+      router.push(`/products?q=${encodeURIComponent(q)}`);
+    }
   };
 
   return (
@@ -96,6 +106,11 @@ export function AppHeader() {
               <Input
                 placeholder="Tìm kiếm sản phẩm..."
                 className="pl-10 rounded-2xl"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") doSearch();
+                }}
               />
             </div>
           </div>
@@ -185,6 +200,11 @@ export function AppHeader() {
                 <Input
                   placeholder="Tìm kiếm sản phẩm..."
                   className="pl-10 rounded-2xl"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") doSearch();
+                  }}
                 />
               </div>
             </nav>
