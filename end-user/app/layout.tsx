@@ -14,6 +14,14 @@ export const metadata: Metadata = {
   title: "ReRent - Nền tảng cho thuê đồ dùng hàng đầu Việt Nam",
   description:
     "Thuê dễ dàng, trả nhanh chóng, giá cả hợp lý. Từ thiết bị điện tử đến đồ gia dụng, tất cả đều có sẵn tại ReRent.",
+  icons: {
+    icon: [
+      { rel: "icon", url: "/favicon-32x32.png", sizes: "32x32" },
+      { rel: "icon", url: "/favicon-16x16.png", sizes: "16x16" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
