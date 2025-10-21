@@ -6,6 +6,8 @@ import { ArrowRight } from "lucide-react";
 import { Category } from "@/lib/types";
 
 export function CategoriesGrid({ categories }: { categories: Category[] }) {
+  const featuredCategories = categories.slice(0, 4);
+
   return (
     <section className="py-20 bg-muted/20">
       <div className="container mx-auto px-4">
@@ -20,7 +22,7 @@ export function CategoriesGrid({ categories }: { categories: Category[] }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((category) => (
+          {featuredCategories.map((category) => (
             <Link key={category.id} href={`/categories/${category.id}`}>
               <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 rounded-2xl border-0 bg-background/60 backdrop-blur">
                 <CardContent className="p-6">
