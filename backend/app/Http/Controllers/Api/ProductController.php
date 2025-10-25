@@ -23,6 +23,14 @@ class ProductController extends Controller
         $query = Product::with(['category', 'shop']);
 
         // Filters
+        // Full-text-ish search: match name or description (partial, case-insensitive)
+        if ($request->has('q')) {
+            $search = $request->query('q');
+            $query->where(function ($builder) use ($search) {
+                $builder->where('name', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
         if ($request->has('min_price')) {
             $min = (float) $request->query('min_price');
             $query->where('price', '>=', $min);

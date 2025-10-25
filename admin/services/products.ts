@@ -12,6 +12,7 @@ export const getProducts = async (
   if (filters) {
     if (filters.min_price) params.min_price = filters.min_price;
     if (filters.max_price) params.max_price = filters.max_price;
+    if (filters.q) params.q = filters.q;
     if (filters.categories && filters.categories.length)
       params.categories = filters.categories.join(",");
     if (filters.status && filters.status.length)
