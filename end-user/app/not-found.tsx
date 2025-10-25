@@ -32,7 +32,7 @@ export default function NotFound() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              1000
+              404
             </motion.h1>
 
             {/* Floating Elements */}
