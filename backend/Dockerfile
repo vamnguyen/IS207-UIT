@@ -34,5 +34,7 @@ ENV PORT=8000
 # 9️⃣ Expose port (chỉ để tham khảo, Render tự map cổng thật)
 EXPOSE 8000
 
-# 🔟 Khởi chạy Laravel với dynamic port của Render
-CMD php artisan serve --host=0.0.0.0 --port=${PORT}
+# 🔟 Set entrypoint to run migrations rồi khởi động server
+RUN chmod +x docker-entrypoint.sh
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
