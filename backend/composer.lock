@@ -1360,16 +1360,16 @@
         },
         {
             "name": "laravel/cashier",
-            "version": "v16.0.1",
+            "version": "v16.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/cashier-stripe.git",
-                "reference": "287adbbf06307a2ed7b29c1a3f7e7b5d25bef03a"
+                "reference": "20e9c9702e1171e0aaddb0e82441a16602f3b2d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/cashier-stripe/zipball/287adbbf06307a2ed7b29c1a3f7e7b5d25bef03a",
-                "reference": "287adbbf06307a2ed7b29c1a3f7e7b5d25bef03a",
+                "url": "https://api.github.com/repos/laravel/cashier-stripe/zipball/20e9c9702e1171e0aaddb0e82441a16602f3b2d0",
+                "reference": "20e9c9702e1171e0aaddb0e82441a16602f3b2d0",
                 "shasum": ""
             },
             "require": {
@@ -1447,7 +1447,7 @@
                 "issues": "https://github.com/laravel/cashier/issues",
                 "source": "https://github.com/laravel/cashier"
             },
-            "time": "2025-09-25T20:21:11+00:00"
+            "time": "2025-10-21T15:19:55+00:00"
         },
         {
             "name": "laravel/framework",
