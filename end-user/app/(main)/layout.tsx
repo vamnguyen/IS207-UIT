@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import React from "react";
 import { AppHeader } from "@/components/layout/app-header";
 import { Footer } from "@/components/layout/footer";
+import { ChatWidget } from "@/components/chat/chat-widget";
 
 export const metadata: Metadata = {
   title: {
@@ -20,6 +21,7 @@ export default function MainLayout({
       <AppHeader />
       {children}
       <Footer />
+      <ChatWidget />
     </>
   );
 }

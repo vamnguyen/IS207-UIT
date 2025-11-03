@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\AdminDashboardController;
+use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\ConversationController;
+use App\Http\Controllers\Api\MessageController;
 
 // ========================== Public routes ==========================
 // 1. Auth & User
@@ -36,6 +39,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    // 2. Chat Assistant
+    Route::post('/chat/assistant', [ChatController::class, 'invoke']);
+    Route::get('/chat/conversations', [ConversationController::class, 'index']);
+    Route::post('/chat/conversations', [ConversationController::class, 'store']);
+    Route::get('/chat/conversations/{conversation}', [ConversationController::class, 'show']);
+    Route::patch('/chat/conversations/{conversation}', [ConversationController::class, 'update']);
+    Route::delete('/chat/conversations/{conversation}', [ConversationController::class, 'destroy']);
+    Route::get('/chat/conversations/{conversation}/messages', [MessageController::class, 'index']);
 
     // 3. Category
     Route::middleware('role:admin')->group(function () {

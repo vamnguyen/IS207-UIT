@@ -117,3 +117,58 @@ export type ProductFilters = {
   q?: string;
   sort?: string;
 };
+
+export type ChatRole = "user" | "assistant";
+
+export interface ChatMessage {
+  id: number;
+  conversation_id: number;
+  role: ChatRole;
+  content: string;
+  metadata: Record<string, unknown> | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface ChatConversationLatestMessage {
+  id: number;
+  role: ChatRole;
+  content: string;
+  metadata: Record<string, unknown> | null;
+  created_at: string | null;
+}
+
+export interface ChatConversation {
+  id: number;
+  title: string | null;
+  last_message_at: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  messages_count: number;
+  latest_message: ChatConversationLatestMessage | null;
+}
+
+export interface ChatConversationsResponse {
+  data: ChatConversation[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+}
+
+export interface ChatMessagesResponse {
+  data: ChatMessage[];
+  meta: {
+    has_more: boolean;
+    next_before_id: number | null;
+    limit: number;
+  };
+}
+
+export interface ChatAssistantResponse {
+  conversation_id: number;
+  message: string;
+  usage: Record<string, unknown> | null;
+}

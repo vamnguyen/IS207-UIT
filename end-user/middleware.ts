@@ -20,6 +20,13 @@ export function middleware(request: NextRequest) {
     (path) => pathname === path || pathname.startsWith(`${path}/`)
   );
 
+  const isAuthRoute = pathname === "/login" || pathname === "/register";
+
+  if (token && isAuthRoute) {
+    const homeUrl = new URL("/", request.url);
+    return NextResponse.redirect(homeUrl);
+  }
+
   // Nếu không phải public và chưa có token -> redirect về login
   if (!isPublic && !token) {
     const loginUrl = new URL("/login", request.url);
