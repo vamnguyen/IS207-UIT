@@ -57,7 +57,7 @@ export default function ChatbotFloating() {
               ×
             </button>
           </div>
-          <Chatbot />
+          <Chatbot onClose={() => setOpen(false)} />
         </div>
       )}
     </>
