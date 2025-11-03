@@ -38,7 +38,7 @@ export default function Chatbot({ onClose }: { onClose?: () => void }) {
         zIndex: 9999,
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "flex-end",
         background: "rgba(0,0,0,0.18)",
       }}
     >
@@ -50,17 +50,18 @@ export default function Chatbot({ onClose }: { onClose?: () => void }) {
           maxHeight: "100dvh",
           background: "var(--card)",
           borderRadius: "var(--radius-xl)",
-          boxShadow: "0 8px 32px 0 #0003",
+          boxShadow: "0 2px 8px #0001",
           padding: 0,
           border: "1.5px solid var(--border)",
           overflow: "hidden",
           fontFamily: 'Inter, Arial, sans-serif',
           display: "flex",
           flexDirection: "column",
+          marginRight: 40,
         }}
       >
         <div style={{
-          background: "linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%)",
+          background: "var(--primary)",
           color: "var(--primary-foreground)",
           padding: "18px 0 14px 0",
           textAlign: "center",
@@ -73,7 +74,7 @@ export default function Chatbot({ onClose }: { onClose?: () => void }) {
         }}>
           Hỗ trợ viên Rerent
           {onClose && (
-          <button
+            <button
               onClick={onClose}
               style={{
                 position: "absolute",
@@ -82,14 +83,14 @@ export default function Chatbot({ onClose }: { onClose?: () => void }) {
                 background: "none",
                 border: "none",
                 color: "var(--primary-foreground)",
-                fontSize: 32,
+                fontSize: 40,
                 fontWeight: 700,
                 cursor: "pointer",
                 opacity: 0.7,
                 transition: "opacity 0.2s",
                 lineHeight: 1,
-                width: 40,
-                height: 40,
+                width: 48,
+                height: 48,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center"
@@ -129,9 +130,9 @@ export default function Chatbot({ onClose }: { onClose?: () => void }) {
             >
               <div
                 style={{
-                  background: msg.role === "user"
-                    ? "linear-gradient(90deg, var(--primary) 80%, var(--secondary) 100%)"
-                    : "var(--secondary)",
+          background: msg.role === "user"
+            ? "var(--primary)"
+            : "var(--secondary)",
                   color: msg.role === "user"
                     ? "var(--primary-foreground)"
                     : "var(--secondary-foreground)",
@@ -183,7 +184,7 @@ export default function Chatbot({ onClose }: { onClose?: () => void }) {
             style={{
               padding: "12px 22px",
               borderRadius: "var(--radius-lg)",
-              background: "linear-gradient(90deg, var(--primary) 80%, var(--secondary) 100%)",
+              background: "var(--primary)",
               color: "var(--primary-foreground)",
               border: "none",
               fontWeight: 700,
