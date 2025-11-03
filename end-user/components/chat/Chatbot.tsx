@@ -39,7 +39,7 @@ export default function Chatbot({ onClose }: { onClose?: () => void }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-end",
-        background: "rgba(0,0,0,0.18)",
+        background: "",
       }}
     >
       <div
