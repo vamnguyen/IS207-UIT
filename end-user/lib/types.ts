@@ -167,8 +167,32 @@ export interface ChatMessagesResponse {
   };
 }
 
-export interface ChatAssistantResponse {
+export type ChatStreamEvent =
+  | {
+      event: "conversation";
+      conversation_id: number;
+    }
+  | {
+      event: "delta";
+      conversation_id: number;
+      content: string;
+    }
+  | {
+      event: "done";
+      conversation_id: number;
+      message: string;
+      metadata: Record<string, unknown> | null;
+      usage: Record<string, unknown> | null;
+    }
+  | {
+      event: "error";
+      conversation_id: number;
+      message: string;
+    };
+
+export interface ChatStreamResult {
   conversation_id: number;
   message: string;
+  metadata: Record<string, unknown> | null;
   usage: Record<string, unknown> | null;
 }

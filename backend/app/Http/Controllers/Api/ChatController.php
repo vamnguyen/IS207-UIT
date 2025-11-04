@@ -38,68 +38,148 @@ class ChatController extends Controller
             $conversation->update(['last_message_at' => now()]);
         });
 
-        $shortcutResponse = $this->tryHandleShortcuts($conversation, $user, $data['message']);
+        $shortcutResponse = $this->tryHandleShortcuts($user, $data['message']);
 
-        if ($shortcutResponse !== null) {
-            DB::transaction(function () use ($conversation, $shortcutResponse) {
-                $conversation->messages()->create([
-                    'role' => 'assistant',
-                    'content' => $shortcutResponse['message'],
-                    'metadata' => $shortcutResponse['metadata'],
+        return response()->stream(function () use ($conversation, $shortcutResponse, $user, $data) {
+            ignore_user_abort(true);
+            set_time_limit(0);
+
+            $this->streamEvent([
+                'event' => 'conversation',
+                'conversation_id' => $conversation->id,
+            ]);
+
+            if ($shortcutResponse !== null) {
+                $message = $shortcutResponse['message'];
+                $metadata = $shortcutResponse['metadata'] ?? null;
+
+                $this->streamEvent([
+                    'event' => 'delta',
+                    'conversation_id' => $conversation->id,
+                    'content' => $message,
                 ]);
 
-                $conversation->update(['last_message_at' => now()]);
-            });
+                $this->streamEvent([
+                    'event' => 'done',
+                    'conversation_id' => $conversation->id,
+                    'message' => $message,
+                    'metadata' => $metadata,
+                    'usage' => null,
+                ]);
 
-            return response()->json([
-                'conversation_id' => $conversation->id,
-                'message' => $shortcutResponse['message'],
-                'usage' => null,
-            ]);
-        }
+                DB::transaction(function () use ($conversation, $message, $metadata) {
+                    $conversation->messages()->create([
+                        'role' => 'assistant',
+                        'content' => $message,
+                        'metadata' => $metadata,
+                    ]);
 
-        $apiPayload = $this->buildApiPayload($conversation, $user, $data['message']);
+                    $conversation->update(['last_message_at' => now()]);
+                });
 
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . config('services.openrouter.key'),
-                'Content-Type' => 'application/json',
-                'HTTP-Referer' => config('app.url'),
-                'X-Title' => config('app.name'),
-            ])->post('https://openrouter.ai/api/v1/chat/completions', $apiPayload)->throw();
-        } catch (Throwable $exception) {
-            Log::error('OpenRouter request failed', [
-                'conversation_id' => $conversation->id,
-                'message' => $exception->getMessage(),
-            ]);
+                return;
+            }
 
-            return response()->json([
-                'error' => 'Failed to contact assistant. Please try again later.',
-            ], 500);
-        }
+            $apiPayload = $this->buildApiPayload($conversation, $user, $data['message']);
 
-        $completion = $response->json();
+            try {
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . config('services.openrouter.key'),
+                    'Content-Type' => 'application/json',
+                    'HTTP-Referer' => config('app.url'),
+                    'X-Title' => config('app.name'),
+                ])->timeout(0)->withOptions(['stream' => true])->post('https://openrouter.ai/api/v1/chat/completions', $apiPayload);
 
-        $assistantMessage = $completion['choices'][0]['message']['content'] ?? 'Assistant did not respond.';
+                if ($response->failed()) {
+                    $this->streamEvent([
+                        'event' => 'error',
+                        'conversation_id' => $conversation->id,
+                        'message' => 'Assistant service returned an error. Please try again later.',
+                    ]);
 
-        DB::transaction(function () use ($conversation, $assistantMessage, $completion, $apiPayload) {
-            $conversation->messages()->create([
-                'role' => 'assistant',
-                'content' => $assistantMessage,
-                'metadata' => [
-                    'model' => $apiPayload['model'] ?? null,
-                    'usage' => $completion['usage'] ?? null,
-                    'response_id' => $completion['id'] ?? null,
-                ],
-            ]);
+                    Log::error('OpenRouter request failed', [
+                        'conversation_id' => $conversation->id,
+                        'status' => $response->status(),
+                        'body' => $response->body(),
+                    ]);
 
-            $conversation->update(['last_message_at' => now()]);
-        });
+                    return;
+                }
 
-        return response()->json([
-            'conversation_id' => $conversation->id,
-            'message' => $assistantMessage,
-            'usage' => $completion['usage'] ?? null,
+                $stream = $response->toPsrResponse()->getBody();
+                $buffer = '';
+                $assistantMessage = '';
+                $usage = null;
+                $responseId = null;
+                $model = $apiPayload['model'] ?? null;
+                $finished = false;
+
+                while (! $stream->eof()) {
+                    $chunk = $stream->read(1024);
+
+                    if ($chunk === false) {
+                        break;
+                    }
+
+                    $buffer .= $chunk;
+
+                    while (($position = strpos($buffer, "\n\n")) !== false) {
+                        $packet = substr($buffer, 0, $position);
+                        $buffer = substr($buffer, $position + 2);
+
+                        $finished = $this->handleProviderStreamPacket($packet, $conversation->id, $assistantMessage, $usage, $responseId, $model);
+
+                        if ($finished) {
+                            break 2;
+                        }
+                    }
+                }
+
+                if (! $finished && trim($buffer) !== '') {
+                    $this->handleProviderStreamPacket($buffer, $conversation->id, $assistantMessage, $usage, $responseId, $model);
+                }
+
+                $this->streamEvent([
+                    'event' => 'done',
+                    'conversation_id' => $conversation->id,
+                    'message' => $assistantMessage !== '' ? $assistantMessage : 'Assistant did not respond.',
+                    'metadata' => [
+                        'model' => $model,
+                        'response_id' => $responseId,
+                    ],
+                    'usage' => $usage,
+                ]);
+
+                DB::transaction(function () use ($conversation, $assistantMessage, $usage, $model, $responseId) {
+                    $conversation->messages()->create([
+                        'role' => 'assistant',
+                        'content' => $assistantMessage !== '' ? $assistantMessage : 'Assistant did not respond.',
+                        'metadata' => [
+                            'model' => $model,
+                            'usage' => $usage,
+                            'response_id' => $responseId,
+                        ],
+                    ]);
+
+                    $conversation->update(['last_message_at' => now()]);
+                });
+            } catch (Throwable $exception) {
+                Log::error('OpenRouter stream failed', [
+                    'conversation_id' => $conversation->id,
+                    'message' => $exception->getMessage(),
+                ]);
+
+                $this->streamEvent([
+                    'event' => 'error',
+                    'conversation_id' => $conversation->id,
+                    'message' => 'Failed to contact assistant. Please try again later.',
+                ]);
+            }
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache, no-transform',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no',
         ]);
     }
 
@@ -138,7 +218,7 @@ class ChatController extends Controller
         return [
             'model' => 'openai/gpt-oss-20b:free',
             'messages' => $messages,
-            'stream' => false,
+            'stream' => true,
         ];
     }
 
@@ -149,7 +229,67 @@ class ChatController extends Controller
         return number_format($numeric, 0, ',', '.') . '₫';
     }
 
-    protected function tryHandleShortcuts(Conversation $conversation, User $user, string $latestMessage): ?array
+    protected function streamEvent(array $payload): void
+    {
+        echo 'data: ' . json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n\n";
+
+        if (function_exists('ob_flush')) {
+            @ob_flush();
+        }
+
+        flush();
+    }
+
+    protected function handleProviderStreamPacket(
+        string $packet,
+        int $conversationId,
+        string &$assistantMessage,
+        ?array &$usage,
+        ?string &$responseId,
+        ?string &$model
+    ): bool {
+        $lines = preg_split("/\r?\n/", $packet) ?: [];
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            if ($line === '' || !str_starts_with($line, 'data:')) {
+                continue;
+            }
+
+            $data = trim(substr($line, 5));
+
+            if ($data === '[DONE]') {
+                return true;
+            }
+
+            $decoded = json_decode($data, true);
+
+            if (! is_array($decoded)) {
+                continue;
+            }
+
+            $responseId = $decoded['id'] ?? $responseId;
+            $model = $decoded['model'] ?? $model;
+            $usage = $decoded['usage'] ?? $usage;
+
+            $delta = data_get($decoded, 'choices.0.delta.content');
+
+            if (is_string($delta) && $delta !== '') {
+                $assistantMessage .= $delta;
+
+                $this->streamEvent([
+                    'event' => 'delta',
+                    'conversation_id' => $conversationId,
+                    'content' => $delta,
+                ]);
+            }
+        }
+
+        return false;
+    }
+
+    protected function tryHandleShortcuts(User $user, string $latestMessage): ?array
     {
         $normalized = Str::of($latestMessage)->lower()->squish()->value();
         $normalizedAscii = Str::of($normalized)->ascii()->value();
@@ -202,7 +342,7 @@ class ChatController extends Controller
         })->all();
 
         return [
-            'message' => "Top sản phẩm bán chạy:\n" . implode("\n", $lines),
+            'message' => "Top 5 sản phẩm bán chạy:\n" . implode("\n", $lines),
             'metadata' => [
                 'shortcut' => 'best_sellers',
                 'count' => $bestSellers->count(),

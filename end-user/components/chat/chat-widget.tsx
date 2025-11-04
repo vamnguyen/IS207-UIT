@@ -33,12 +33,14 @@ import {
   ChatConversation,
   ChatMessage,
   ChatMessagesResponse,
+  ChatStreamResult,
 } from "@/lib/types";
 import {
   createChatConversation,
   getChatConversations,
   getChatMessages,
-  sendChatMessage,
+  streamChatMessage,
+  type StreamChatMessageParams,
 } from "@/services/chat";
 
 const MESSAGE_PAGE_SIZE = 30;
@@ -169,8 +171,12 @@ export function ChatWidget() {
     },
   });
 
-  const sendMessageMutation = useMutation({
-    mutationFn: sendChatMessage,
+  const sendMessageMutation = useMutation<
+    ChatStreamResult,
+    Error,
+    StreamChatMessageParams
+  >({
+    mutationFn: (params) => streamChatMessage(params),
   });
 
   const handleSend = async () => {
@@ -186,6 +192,7 @@ export function ChatWidget() {
 
     const nowIso = new Date().toISOString();
     const tempId = Date.now();
+    const assistantTempId = tempId + 1;
 
     const optimisticMessage: ChatMessage = {
       id: tempId,
@@ -197,13 +204,68 @@ export function ChatWidget() {
       updated_at: nowIso,
     };
 
-    setOptimisticMessages((prev) => [...prev, optimisticMessage]);
+    const optimisticAssistant: ChatMessage = {
+      id: assistantTempId,
+      conversation_id: selectedConversationId ?? 0,
+      role: "assistant",
+      content: "",
+      metadata: null,
+      created_at: nowIso,
+      updated_at: nowIso,
+    };
+
+    setOptimisticMessages((prev) => [
+      ...prev,
+      optimisticMessage,
+      optimisticAssistant,
+    ]);
     setInputValue("");
+
+    let errorHandled = false;
 
     try {
       const response = await sendMessageMutation.mutateAsync({
-        conversation_id: selectedConversationId ?? undefined,
-        message: trimmed,
+        payload: {
+          conversation_id: selectedConversationId ?? undefined,
+          message: trimmed,
+        },
+        onConversation: (conversationId) => {
+          setSelectedConversationId((prev) => prev ?? conversationId);
+          setOptimisticMessages((prev) =>
+            prev.map((item) =>
+              item.id === tempId || item.id === assistantTempId
+                ? { ...item, conversation_id: conversationId }
+                : item
+            )
+          );
+        },
+        onDelta: (chunk) => {
+          setOptimisticMessages((prev) =>
+            prev.map((item) =>
+              item.id === assistantTempId
+                ? { ...item, content: `${item.content}${chunk}` }
+                : item
+            )
+          );
+        },
+        onDone: (payload) => {
+          setOptimisticMessages((prev) =>
+            prev.map((item) =>
+              item.id === assistantTempId
+                ? {
+                    ...item,
+                    conversation_id: payload.conversation_id,
+                    content: payload.message,
+                    metadata: payload.metadata,
+                  }
+                : item
+            )
+          );
+        },
+        onError: (message) => {
+          errorHandled = true;
+          toast.error(message);
+        },
       });
 
       const newConversationId = response.conversation_id;
@@ -214,12 +276,18 @@ export function ChatWidget() {
         queryKey: ["chat-messages", newConversationId],
       });
       setOptimisticMessages((prev) =>
-        prev.filter((item) => item.id !== tempId)
+        prev.filter((item) => item.id !== tempId && item.id !== assistantTempId)
       );
     } catch (error) {
-      toast.error("Không thể gửi tin nhắn. Vui lòng thử lại.");
+      if (!errorHandled) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Không thể gửi tin nhắn. Vui lòng thử lại.";
+        toast.error(message);
+      }
       setOptimisticMessages((prev) =>
-        prev.filter((item) => item.id !== tempId)
+        prev.filter((item) => item.id !== tempId && item.id !== assistantTempId)
       );
     }
   };
