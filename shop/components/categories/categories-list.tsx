@@ -12,7 +12,7 @@ export function CategoriesList({ categories }: { categories: Category[] }) {
         <Link key={category.id} href={`/categories/${category.id}`}>
           <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 rounded-2xl border-0 bg-background/60 backdrop-blur">
             <CardContent className="p-6">
-              <div className="aspect-square rounded-2xl overflow-hidden mb-4 bg-gradient-to-br from-primary/10 to-primary/5">
+              <div className="aspect-square rounded-2xl overflow-hidden mb-4 bg-linear-to-br from-primary/10 to-primary/5">
                 <img
                   src={category.image_url || "/file.svg"}
                   alt={category.name}

@@ -15,7 +15,7 @@ import {
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20 flex items-center justify-center px-4">
       <div className="container mx-auto text-center">
         {/* 404 Animation */}
         <motion.div
@@ -27,7 +27,7 @@ export default function NotFound() {
           <div className="relative">
             {/* Large 404 Text */}
             <motion.h1
-              className="text-8xl md:text-9xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4"
+              className="text-8xl md:text-9xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent mb-4"
               initial={{ y: -50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}

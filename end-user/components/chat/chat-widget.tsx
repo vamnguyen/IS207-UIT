@@ -313,7 +313,7 @@ export function ChatWidget() {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {isOpen ? (
-        <div className="flex h-[38rem] w-[22rem] flex-col overflow-hidden rounded-2xl border bg-background shadow-xl sm:w-[24rem]">
+        <div className="flex h-152 w-86 flex-col overflow-hidden rounded-2xl border bg-background shadow-xl sm:w-[24rem]">
           <header className="flex items-center justify-between border-b bg-primary px-4 py-3 text-primary-foreground">
             <div>
               <p className="text-sm font-semibold">Trợ lý ReRent AI</p>

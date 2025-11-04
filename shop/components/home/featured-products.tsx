@@ -38,7 +38,7 @@ export function FeaturedProducts({ products }: { products: Product[] }) {
               className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 rounded-2xl border-0 bg-background/60 backdrop-blur overflow-hidden"
             >
               <div className="relative">
-                <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-muted/50 to-muted/20">
+                <div className="aspect-4/3 overflow-hidden bg-linear-to-br from-muted/50 to-muted/20">
                   <img
                     src={product.image_url}
                     alt={product.name}

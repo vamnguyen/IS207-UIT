@@ -36,7 +36,7 @@ export function CheckoutSummary({
         <div className="space-y-4">
           {items.map((item) => (
             <div key={item.id} className="flex gap-3">
-              <div className="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-muted/50 to-muted/20 flex-shrink-0">
+              <div className="w-16 h-16 rounded-xl overflow-hidden bg-linear-to-br from-muted/50 to-muted/20 flex-shrink-0">
                 <img
                   src={item.product.image_url || "/file.svg"}
                   alt={item.product.name}

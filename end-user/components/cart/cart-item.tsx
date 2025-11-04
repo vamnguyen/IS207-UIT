@@ -49,7 +49,7 @@ export function CartItem({ item }: CartItemProps) {
         <div className="flex gap-4">
           {/* Product Image */}
           <Link href={`/products/${item.product.id}`}>
-            <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-muted/50 to-muted/20 flex-shrink-0">
+            <div className="w-24 h-24 rounded-2xl overflow-hidden bg-linear-to-br from-muted/50 to-muted/20 shrink-0">
               <img
                 src={item.product.image_url || "/file.svg"}
                 alt={item.product.name}

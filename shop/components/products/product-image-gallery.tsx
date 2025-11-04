@@ -24,7 +24,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-muted/50 to-muted/20">
+      <div className="relative aspect-square rounded-2xl overflow-hidden bg-linear-to-br from-muted/50 to-muted/20">
         <img
           src={images[currentImageIndex] || "/file.svg"}
           alt={product.name}

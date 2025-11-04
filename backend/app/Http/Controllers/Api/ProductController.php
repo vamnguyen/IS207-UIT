@@ -28,7 +28,7 @@ class ProductController extends Controller
             $search = $request->query('q');
             $query->where(function ($builder) use ($search) {
                 $builder->where('name', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
         if ($request->has('min_price')) {
@@ -105,7 +105,6 @@ class ProductController extends Controller
             ]);
 
             return response()->json($product, 201);
-
         } catch (\Exception $e) {
             // Log::error('Product creation failed:', [
             //     'error' => $e->getMessage(),

@@ -44,7 +44,7 @@ export function ProductsGrid() {
           >
             <div className="relative">
               <Link href={`/products/${product.id}`}>
-                <div className="aspect-[4/3] overflow-hidden bg-gradient-to-br from-muted/50 to-muted/20">
+                <div className="aspect-4/3 overflow-hidden bg-linear-to-br from-muted/50 to-muted/20">
                   <img
                     src={product.image_url || "/file.svg"}
                     alt={product.name}

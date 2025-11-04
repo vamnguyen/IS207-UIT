@@ -15,7 +15,7 @@ import {
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/20 flex items-center justify-center px-4">
       <div className="container mx-auto text-center">
         {/* 404 Animation */}
         <motion.div

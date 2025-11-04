@@ -9,7 +9,7 @@ export function CTASection() {
   const router = useRouter();
   return (
     <motion.section
-      className="py-20 px-4 bg-gradient-to-r from-primary/10 to-secondary/10"
+      className="py-20 px-4 bg-linear-to-r from-primary/10 to-secondary/10"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}

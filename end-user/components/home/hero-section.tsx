@@ -4,7 +4,7 @@ import { ArrowRight, Play } from "lucide-react";
 
 export function HeroSection() {
   return (
-    <section className="relative bg-gradient-to-br from-background via-background to-muted/20 py-20 lg:py-32">
+    <section className="relative bg-linear-to-br from-background via-background to-muted/20 py-20 lg:py-32">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
@@ -56,7 +56,7 @@ export function HeroSection() {
 
           {/* Hero Image */}
           <div className="relative">
-            <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 p-8">
+            <div className="relative rounded-3xl overflow-hidden bg-linear-to-br from-primary/10 to-primary/5 p-8">
               <img
                 src="https://images.deepai.org/machine-learning-models/d4b1dd3ee43648a997650dc7f9e6923f/panda.jpeg"
                 alt="ReRent Platform"
