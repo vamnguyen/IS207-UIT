@@ -22,6 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { chatDisplayName, formatConversationDate } from "@/lib/utils-chat";
 import {
@@ -260,7 +265,7 @@ export function ChatWidget() {
             </Button>
           </header>
 
-          <div className="flex items-center gap-2 border-b px-3 py-2 text-sm">
+          <div className="flex items-center justify-between gap-2 border-b px-3 py-2 text-sm">
             <Select
               disabled={isLoadingConversations || conversations.length === 0}
               value={
@@ -272,9 +277,8 @@ export function ChatWidget() {
                 setSelectedConversationId(Number(value))
               }
             >
-              <SelectTrigger className="h-9 text-xs truncate">
+              <SelectTrigger className="h-9 text-xs flex-1">
                 <SelectValue
-                  className="truncate"
                   placeholder={
                     isLoadingConversations
                       ? "Đang tải..."
@@ -303,19 +307,24 @@ export function ChatWidget() {
               </SelectContent>
             </Select>
 
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-9 w-9"
-              onClick={() => createConversationMutation.mutate()}
-              disabled={createConversationMutation.isPending}
-            >
-              {createConversationMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Plus className="h-4 w-4" />
-              )}
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => createConversationMutation.mutate()}
+                  disabled={createConversationMutation.isPending}
+                >
+                  {createConversationMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Tạo cuộc trò chuyện mới</TooltipContent>
+            </Tooltip>
           </div>
 
           <div
