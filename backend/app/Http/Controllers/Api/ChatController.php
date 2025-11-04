@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Order;
-use App\Models\Product;
+use App\Models\OrderItem;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -36,6 +37,26 @@ class ChatController extends Controller
             ]);
             $conversation->update(['last_message_at' => now()]);
         });
+
+        $shortcutResponse = $this->tryHandleShortcuts($conversation, $user, $data['message']);
+
+        if ($shortcutResponse !== null) {
+            DB::transaction(function () use ($conversation, $shortcutResponse) {
+                $conversation->messages()->create([
+                    'role' => 'assistant',
+                    'content' => $shortcutResponse['message'],
+                    'metadata' => $shortcutResponse['metadata'],
+                ]);
+
+                $conversation->update(['last_message_at' => now()]);
+            });
+
+            return response()->json([
+                'conversation_id' => $conversation->id,
+                'message' => $shortcutResponse['message'],
+                'usage' => null,
+            ]);
+        }
 
         $apiPayload = $this->buildApiPayload($conversation, $user, $data['message']);
 
@@ -107,15 +128,6 @@ class ChatController extends Controller
             ['role' => 'system', 'content' => $this->systemPrompt()],
         ];
 
-        $context = $this->buildContextForMessage($user, $latestMessage);
-        if ($context) {
-            $messages[] = ['role' => 'system', 'content' => $context];
-            Log::debug('Chat context payload', [
-                'conversation_id' => $conversation->id,
-                'context' => $context,
-            ]);
-        }
-
         foreach ($history as $entry) {
             $messages[] = [
                 'role' => $entry->role,
@@ -123,136 +135,11 @@ class ChatController extends Controller
             ];
         }
 
-        Log::debug('Chat payload constructed', [
-            'conversation_id' => $conversation->id,
-            'has_context' => $context !== null,
-        ]);
-
         return [
             'model' => 'openai/gpt-oss-20b:free',
             'messages' => $messages,
             'stream' => false,
         ];
-    }
-
-    protected function buildContextForMessage(User $user, string $message): ?string
-    {
-        $normalized = mb_strtolower($message);
-        $asciiNormalized = Str::lower(Str::ascii($message));
-        $contextParts = [];
-
-        if ($this->containsAny($normalized, ['bán chạy', 'best seller', 'hot nhất'], $asciiNormalized)) {
-            Log::debug('Chat context: fetching best sellers', [
-                'user_id' => $user->id,
-                'message' => $message,
-            ]);
-            $bestSellers = Product::query()
-                ->select('products.id', 'products.name', 'products.price')
-                ->selectRaw('COALESCE(SUM(order_items.quantity), 0) as total_sold')
-                ->leftJoin('order_items', 'order_items.product_id', '=', 'products.id')
-                ->groupBy('products.id', 'products.name', 'products.price')
-                ->orderByDesc('total_sold')
-                ->limit(5)
-                ->get();
-
-            if ($bestSellers->isNotEmpty()) {
-                Log::debug('Chat context: best seller results', [
-                    'user_id' => $user->id,
-                    'count' => $bestSellers->count(),
-                    'product_ids' => $bestSellers->pluck('id'),
-                ]);
-                $hasSold = $bestSellers->contains(function ($product) {
-                    return (int) $product->total_sold > 0;
-                });
-
-                $lines = [];
-                foreach ($bestSellers as $index => $product) {
-                    $lines[] = ($index + 1) . '. ' . $product->name . ' — giá ' . $this->formatCurrency($product->price) . ' (đã bán ' . (int) $product->total_sold . ')';
-                }
-
-                if ($hasSold) {
-                    $contextParts[] = "Top sản phẩm bán chạy hiện tại:\n" . implode("\n", $lines);
-                } else {
-                    $latestFallback = Product::query()
-                        ->select('id', 'name', 'price')
-                        ->orderByDesc('created_at')
-                        ->limit(5)
-                        ->get();
-
-                    $fallbackLines = [];
-                    foreach ($latestFallback as $index => $product) {
-                        $fallbackLines[] = ($index + 1) . '. ' . $product->name . ' — giá ' . $this->formatCurrency($product->price);
-                    }
-
-                    $contextParts[] = "Chú ý: Hiện chưa có đơn hàng nào để thống kê bán chạy. Hãy nói rõ điều này và gợi ý người dùng tham khảo các sản phẩm nổi bật sau (lọc theo thời gian cập nhật gần đây):\n" . implode("\n", $fallbackLines);
-                }
-            } else {
-                Log::debug('Chat context: no best sellers found', [
-                    'user_id' => $user->id,
-                ]);
-                $contextParts[] = 'Chú ý: Hiện chưa có sản phẩm nào trong hệ thống để thống kê. Hãy mời người dùng quay lại sau hoặc truy cập danh mục sản phẩm.';
-            }
-        }
-
-        if ($this->containsAny($normalized, ['đơn hàng', 'order', 'đặt hàng', 'đã mua', 'đã order'], $asciiNormalized)) {
-            Log::debug('Chat context: fetching recent orders', [
-                'user_id' => $user->id,
-                'message' => $message,
-            ]);
-            $orders = Order::query()
-                ->with(['items.product'])
-                ->where('user_id', $user->id)
-                ->latest('created_at')
-                ->limit(5)
-                ->get();
-
-            if ($orders->isNotEmpty()) {
-                $lines = [];
-                foreach ($orders as $order) {
-                    $items = $order->items->map(function ($item) {
-                        return $item->product?->name . ' x' . $item->quantity;
-                    })->filter()->implode(', ');
-
-                    $lines[] = '- Đơn #' . $order->id . ' (' . ($order->status ?? 'chưa rõ trạng thái') . ') tổng ' . $this->formatCurrency($order->total_amount) . ($items ? ': ' . $items : '');
-                }
-
-                $contextParts[] = "Các đơn hàng gần đây của user:\n" . implode("\n", $lines);
-            } else {
-                Log::debug('Chat context: no recent orders found', [
-                    'user_id' => $user->id,
-                ]);
-                $contextParts[] = 'Chú ý: Hệ thống chưa ghi nhận đơn hàng nào cho người dùng này. Hãy trả lời nhẹ nhàng rằng chưa có lịch sử đơn hàng và hướng dẫn họ truy cập trang "Đơn hàng" để theo dõi khi có giao dịch.';
-            }
-        }
-
-        if (empty($contextParts)) {
-            Log::debug('Chat context: no contextual data available', [
-                'user_id' => $user->id,
-                'message' => $message,
-            ]);
-
-            return null;
-        }
-
-        return "Thông tin nội bộ để tham khảo khi trả lời:\n" . implode("\n\n", $contextParts);
-    }
-
-    protected function containsAny(string $haystack, array $needles, ?string $asciiHaystack = null): bool
-    {
-        foreach ($needles as $needle) {
-            if ($needle !== '' && str_contains($haystack, $needle)) {
-                return true;
-            }
-
-            if ($asciiHaystack !== null) {
-                $asciiNeedle = Str::lower(Str::ascii($needle));
-                if ($asciiNeedle !== '' && str_contains($asciiHaystack, $asciiNeedle)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     protected function formatCurrency($value): string
@@ -262,10 +149,157 @@ class ChatController extends Controller
         return number_format($numeric, 0, ',', '.') . '₫';
     }
 
+    protected function tryHandleShortcuts(Conversation $conversation, User $user, string $latestMessage): ?array
+    {
+        $normalized = Str::of($latestMessage)->lower()->squish()->value();
+        $normalizedAscii = Str::of($normalized)->ascii()->value();
+
+        $bestSellerTriggers = ['sản phẩm bán chạy', 'best seller'];
+        $bestSellerAsciiTriggers = ['san pham ban chay', 'best seller'];
+
+        if (in_array($normalized, $bestSellerTriggers, true) || in_array($normalizedAscii, $bestSellerAsciiTriggers, true)) {
+            return $this->buildBestSellerResponse();
+        }
+
+        $ordersTriggers = ['đơn hàng tôi đã mua'];
+        $ordersAsciiTriggers = ['don hang toi da mua'];
+
+        if (in_array($normalized, $ordersTriggers, true) || in_array($normalizedAscii, $ordersAsciiTriggers, true)) {
+            return $this->buildUserOrdersResponse($user);
+        }
+
+        return null;
+    }
+
+    protected function buildBestSellerResponse(): array
+    {
+        $bestSellers = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_quantity'))
+            ->with(['product' => function ($query) {
+                $query->select('id', 'name', 'price');
+            }])
+            ->groupBy('product_id')
+            ->orderByDesc('total_quantity')
+            ->limit(5)
+            ->get();
+
+        if ($bestSellers->isEmpty()) {
+            return [
+                'message' => 'Hiện chưa có dữ liệu để xác định sản phẩm bán chạy.',
+                'metadata' => [
+                    'shortcut' => 'best_sellers',
+                    'count' => 0,
+                ],
+            ];
+        }
+
+        $lines = $bestSellers->map(function ($item, $index) {
+            $product = $item->product;
+            $name = $product?->name ?? ('Sản phẩm #' . $item->product_id);
+            $price = $product?->price !== null ? $this->formatCurrency($product->price) : 'Giá chưa cập nhật';
+            $quantity = (int) ($item->total_quantity ?? 0);
+
+            return sprintf('%d. %s - %s (%d lượt thuê)', $index + 1, $name, $price, $quantity);
+        })->all();
+
+        return [
+            'message' => "Top sản phẩm bán chạy:\n" . implode("\n", $lines),
+            'metadata' => [
+                'shortcut' => 'best_sellers',
+                'count' => $bestSellers->count(),
+            ],
+        ];
+    }
+
+    protected function buildUserOrdersResponse(User $user): array
+    {
+        $orders = Order::with(['items.product' => function ($query) {
+            $query->select('id', 'name');
+        }])
+            ->where('user_id', $user->id)
+            ->latest('created_at')
+            ->limit(5)
+            ->get();
+
+        if ($orders->isEmpty()) {
+            return [
+                'message' => 'Bạn chưa có đơn hàng nào trong hệ thống.',
+                'metadata' => [
+                    'shortcut' => 'user_orders',
+                    'count' => 0,
+                ],
+            ];
+        }
+
+        $lines = $orders->map(function (Order $order, $index) {
+            $status = $order->status ?? 'Chưa cập nhật';
+            $total = $this->formatCurrency($order->total_amount ?? 0);
+            $period = $this->formatOrderPeriod($order);
+
+            $items = $order->items->map(function ($item) {
+                $productName = $item->product?->name ?? ('Sản phẩm #' . $item->product_id);
+
+                return $productName . ' x' . $item->quantity;
+            })->implode(', ');
+
+            $details = sprintf('%d. Đơn #%s - Trạng thái: %s - Tổng: %s', $index + 1, $order->id, $status, $total);
+
+            if ($period !== null) {
+                $details .= "\n   {$period}";
+            }
+
+            if ($items !== '') {
+                $details .= "\n   Sản phẩm: {$items}";
+            }
+
+            return $details;
+        })->all();
+
+        return [
+            'message' => "Đây là các đơn hàng gần đây của bạn:\n" . implode("\n\n", $lines),
+            'metadata' => [
+                'shortcut' => 'user_orders',
+                'count' => $orders->count(),
+            ],
+        ];
+    }
+
+    protected function formatOrderPeriod(Order $order): ?string
+    {
+        $start = $this->formatDate($order->start_date ?? null);
+        $end = $this->formatDate($order->end_date ?? null);
+
+        if ($start !== null && $end !== null) {
+            return "Thời gian thuê: {$start} - {$end}";
+        }
+
+        if ($start !== null) {
+            return "Bắt đầu: {$start}";
+        }
+
+        if ($end !== null) {
+            return "Kết thúc: {$end}";
+        }
+
+        return null;
+    }
+
+    protected function formatDate($value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($value)->format('d/m/Y');
+        } catch (Throwable $exception) {
+            return (string) $value;
+        }
+    }
+
     protected function systemPrompt(): string
     {
-        return 'Bạn là trợ lý ảo của nền tảng thương mại điện tử cho thuê đồ ReRent Store. ' .
+        return 'Bạn là trợ lý ảo của nền tảng thương mại điện tử cho thuê đồ ReRent. ' .
             'Ưu tiên sử dụng dữ liệu cửa hàng (sản phẩm, đơn hàng, thanh toán) được cung cấp trong các thông điệp hệ thống. ' .
-            'Nếu thiếu thông tin, trả lời trung thực và gợi ý người dùng thực hiện thao tác phù hợp trên website.';
+            'Gợi ý người dùng thử các lệnh nhanh: "sản phẩm bán chạy" (hoặc "best seller") để xem top sản phẩm và "đơn hàng tôi đã mua" để xem lịch sử đơn hàng của họ.';
     }
 }
