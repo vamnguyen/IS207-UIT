@@ -1,5 +1,5 @@
-import FaqPage from "./faq-page";
+import FAQPageClient from "./faq-page-client";
 
-export default function ContactPage() {
-  return <FaqPage />;
+export default function FAQPage() {
+  return <FAQPageClient />;
 }

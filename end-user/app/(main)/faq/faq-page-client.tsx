@@ -1,8 +1,9 @@
 "use client";
 
+
 import { useState } from "react";
 
-export default function FAQPage() {
+export default function FAQPageClient() {
   const faqs = [
     {
       q: "Rerent là gì?",
