@@ -9,6 +9,10 @@ const publicPaths: string[] = [
   "/products",
   "/about",
   "/contact",
+  "/faq",
+  "/terms",
+  "/privacy",
+  "/help",
 ];
 
 export function middleware(request: NextRequest) {
