@@ -16,6 +16,13 @@ export enum PaymentMethod {
   CARD = "card",
 }
 
+export enum OrderType {
+  SEND_PACKAGE = "send_package",
+  RECEIVE_PACKAGE = "receive_package",
+  RETURN_PACKAGE = "return_package",
+  RECEIVE_RETURN = "receive_return",
+}
+
 export enum OrderStatus {
   PENDING = "pending",
   CONFIRMED = "confirmed",
@@ -23,6 +30,7 @@ export enum OrderStatus {
   SHIPPED = "shipped",
   DELIVERED = "delivered",
   CANCELLED = "cancelled",
+  RETURNED = "returned",
 }
 
 export enum PaymentStatus {

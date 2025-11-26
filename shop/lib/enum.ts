@@ -19,9 +19,18 @@ export enum PaymentMethod {
 export enum OrderStatus {
   PENDING = "pending",
   CONFIRMED = "confirmed",
-  ACTIVE = "active",
-  RETURNED = "returned",
+  PROCESSING = "processing",
+  SHIPPED = "shipped",
+  DELIVERED = "delivered",
   CANCELLED = "cancelled",
+  RETURNED = "returned",
+}
+
+export enum OrderType {
+  SEND_PACKAGE = "send_package",
+  RECEIVE_PACKAGE = "receive_package",
+  RETURN_PACKAGE = "return_package",
+  RECEIVE_RETURN = "receive_return",
 }
 
 export enum PaymentStatus {
@@ -33,4 +42,5 @@ export enum PaymentStatus {
 export enum UploadFolder {
   PRODUCT_IMAGES = "product-images",
   CATEGORY_IMAGES = "category-images",
+  EVIDENCES = "evidences",
 }

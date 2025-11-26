@@ -51,10 +51,10 @@ export function DetailsOrderClient({ id }: { id: number }) {
         <CardContent className="p-12 text-center">
           <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold mb-2">
-            Bạn chưa có đơn hàng nào
+            Không tìm thấy đơn hàng
           </h3>
           <p className="text-muted-foreground">
-            Khi bạn đặt hàng, chúng sẽ xuất hiện ở đây.
+            Đơn hàng này không chứa sản phẩm của bạn hoặc không tồn tại.
           </p>
         </CardContent>
       </Card>

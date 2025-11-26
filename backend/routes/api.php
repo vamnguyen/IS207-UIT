@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\OrderEvidenceController;
+use App\Http\Controllers\Api\ShopOrderController;
 
 // ========================== Public routes ==========================
 // 1. Auth & User
@@ -62,6 +64,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/products/{product}', [ProductController::class, 'update']);
         Route::delete('/products/{product}', [ProductController::class, 'destroy']);
         Route::get('/shops/{shop}/products', [ProductController::class, 'getByShopId']);
+
+        // Shop Orders
+        Route::get('/shops/orders', [ShopOrderController::class, 'index']);
+        Route::get('/shops/orders/{id}', [ShopOrderController::class, 'show']);
     });
 
     // 5. Comment
@@ -99,4 +105,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/admin/orders', [OrderController::class, 'getOrdersForAdmin']);
         Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus']);
     });
+
+    // 11. Order Evidences
+    Route::get('/orders/{id}/evidences', [OrderEvidenceController::class, 'index']);
+    Route::post('/orders/{id}/evidences', [OrderEvidenceController::class, 'store']);
 });

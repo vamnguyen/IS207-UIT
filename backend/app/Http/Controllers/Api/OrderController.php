@@ -39,7 +39,7 @@ class OrderController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $order = Order::with(['user', 'items.product', 'payment'])
+        $order = Order::with(['user', 'items.product', 'payment', 'evidences.user'])
             ->where('user_id', $request->user()->id)
             ->findOrFail($id);
 
@@ -59,7 +59,7 @@ class OrderController extends Controller
         $validated = $request->validate([
             'status' => [
                 'required',
-                Rule::in(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']),
+                Rule::in(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned']),
             ],
         ]);
 

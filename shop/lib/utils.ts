@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
+import { CheckCircle, Clock, Package, Truck, XCircle } from "lucide-react";
 import { twMerge } from "tailwind-merge";
+import { OrderStatus, PaymentStatus } from "./enum";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -40,3 +42,52 @@ export function getInitials(name: string): string {
     .toUpperCase()
     .slice(0, 2);
 }
+
+export const statusConfig: Record<
+  OrderStatus,
+  {
+    label: OrderStatus;
+    variant: "default" | "secondary" | "destructive" | "outline";
+    icon: any;
+  }
+> = {
+  pending: { label: OrderStatus.PENDING, variant: "secondary", icon: Clock },
+  confirmed: {
+    label: OrderStatus.CONFIRMED,
+    variant: "default",
+    icon: CheckCircle,
+  },
+  processing: {
+    label: OrderStatus.PROCESSING,
+    variant: "default",
+    icon: Package,
+  },
+  shipped: { label: OrderStatus.SHIPPED, variant: "default", icon: Truck },
+  delivered: {
+    label: OrderStatus.DELIVERED,
+    variant: "default",
+    icon: CheckCircle,
+  },
+  cancelled: {
+    label: OrderStatus.CANCELLED,
+    variant: "destructive",
+    icon: XCircle,
+  },
+  returned: {
+    label: OrderStatus.RETURNED,
+    variant: "destructive",
+    icon: XCircle,
+  },
+};
+
+export const paymentStatusConfig: Record<
+  PaymentStatus,
+  {
+    label: PaymentStatus;
+    variant: "default" | "secondary" | "destructive" | "outline";
+  }
+> = {
+  pending: { label: PaymentStatus.PENDING, variant: "secondary" },
+  completed: { label: PaymentStatus.COMPLETED, variant: "default" },
+  failed: { label: PaymentStatus.FAILED, variant: "destructive" },
+};

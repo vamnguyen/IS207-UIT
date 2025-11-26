@@ -17,7 +17,7 @@ class UploadController extends Controller
         $request->validate([
             'folder' => 'required|string|max:255',
             'files' => 'required|array|max:20',
-            'files.*' => 'file|mimes:jpg,jpeg,png,gif,webp|max:5120',
+            'files.*' => 'file|mimes:jpg,jpeg,png,gif,webp,mp4,webm,mov,avi|max:51200',
         ]);
 
         $disk = $request->input('folder');
