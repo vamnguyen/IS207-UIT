@@ -143,7 +143,7 @@ export function OrdersList({ orders }: { orders: Order[] }) {
                           </div>
                         </TableCell>
                         <TableCell className="font-semibold">
-                          {formatCurrency(Number(order.total_amount))}
+                          {formatCurrency(order.total_amount)}
                         </TableCell>
                         <TableCell>
                           <Badge
