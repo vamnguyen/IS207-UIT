@@ -1,23 +1,41 @@
 "use client";
 
 import { useState } from "react";
-import { Order, OrderEvidence } from "@/lib/types";
+import { Order } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { uploadOrderEvidence } from "@/services/orders";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Loader2, Upload, FileVideo, FileImage } from "lucide-react";
 import axiosInstance from "@/lib/axiosInstance";
-import { OrderStatus, OrderType } from "@/lib/enum";
+import { OrderEvidenceType, OrderStatus } from "@/lib/enum";
 
 interface OrderEvidenceSectionProps {
   order: Order;
   onEvidenceUploaded: () => void;
 }
+
+const getDefaultEvidenceType = (status: OrderStatus): OrderEvidenceType => {
+  switch (status) {
+    case OrderStatus.DELIVERED:
+      return OrderEvidenceType.RECEIVE_PACKAGE;
+    case OrderStatus.RETURNED:
+      return OrderEvidenceType.RETURN_PACKAGE;
+    default:
+      return OrderEvidenceType.RECEIVE_PACKAGE; // Default for user
+  }
+};
 
 export function OrderEvidenceSection({
   order,
@@ -26,6 +44,9 @@ export function OrderEvidenceSection({
   const [isUploading, setIsUploading] = useState(false);
   const [note, setNote] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [evidenceType, setEvidenceType] = useState<OrderEvidenceType>(
+    getDefaultEvidenceType(order.status)
+  );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -49,19 +70,9 @@ export function OrderEvidenceSection({
 
       const mediaUrl = uploadRes.data.urls[0];
 
-      // 2. Create evidence record
-      let type: OrderType = OrderType.RECEIVE_PACKAGE; // Default for user
-      // Determine type based on context - simplified logic
-      // In real app, might let user choose or infer strictly from status
-      if (order.status === OrderStatus.PROCESSING)
-        type = OrderType.SEND_PACKAGE; // Shop
-      if (order.status === OrderStatus.DELIVERED)
-        type = OrderType.RECEIVE_PACKAGE; // User
-      if (order.status === OrderStatus.RETURNED)
-        type = OrderType.RETURN_PACKAGE; // User
-
+      // 2. Create evidence record with user-selected type
       await uploadOrderEvidence(order.id, {
-        type,
+        type: evidenceType,
         media_url: mediaUrl,
         note,
       });
@@ -78,16 +89,16 @@ export function OrderEvidenceSection({
     }
   };
 
-  const getTypeLabel = (type: OrderType) => {
+  const getTypeLabel = (type: OrderEvidenceType) => {
     switch (type) {
-      case OrderType.SEND_PACKAGE:
-        return "Shop gửi hàng";
-      case OrderType.RECEIVE_PACKAGE:
-        return "Khách nhận hàng";
-      case OrderType.RETURN_PACKAGE:
-        return "Khách trả hàng";
-      case OrderType.RECEIVE_RETURN:
-        return "Shop nhận trả";
+      case OrderEvidenceType.SEND_PACKAGE:
+        return "Shop đã gửi hàng";
+      case OrderEvidenceType.RECEIVE_PACKAGE:
+        return "Khách đã nhận hàng";
+      case OrderEvidenceType.RETURN_PACKAGE:
+        return "Khách đã trả hàng";
+      case OrderEvidenceType.RECEIVE_RETURN:
+        return "Shop đã nhận trả";
       default:
         return type;
     }
@@ -104,17 +115,40 @@ export function OrderEvidenceSection({
           <div className="p-4 border rounded-lg bg-muted/50">
             <h4 className="font-medium mb-4">Tải lên bằng chứng mới</h4>
             <div className="grid gap-4">
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="evidence-file">
-                  <FileVideo className="size-4" /> Video /{" "}
-                  <FileImage className="size-4" /> Hình ảnh
-                </Label>
-                <Input
-                  id="evidence-file"
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={handleFileChange}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid max-w-sm items-center gap-1.5">
+                  <Label htmlFor="evidence-type">Loại bằng chứng</Label>
+                  <Select
+                    value={evidenceType}
+                    onValueChange={(value) =>
+                      setEvidenceType(value as OrderEvidenceType)
+                    }
+                  >
+                    <SelectTrigger id="evidence-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={OrderEvidenceType.RECEIVE_PACKAGE}>
+                        Khách đã nhận hàng
+                      </SelectItem>
+                      <SelectItem value={OrderEvidenceType.RETURN_PACKAGE}>
+                        Khách đã trả hàng
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid max-w-sm items-center gap-1.5">
+                  <Label htmlFor="evidence-file">
+                    <FileVideo className="size-4" /> Video /{" "}
+                    <FileImage className="size-4" /> Hình ảnh
+                  </Label>
+                  <Input
+                    id="evidence-file"
+                    type="file"
+                    accept="image/*,video/*"
+                    onChange={handleFileChange}
+                  />
+                </div>
               </div>
               <div className="grid w-full gap-1.5">
                 <Label htmlFor="evidence-note">Ghi chú</Label>

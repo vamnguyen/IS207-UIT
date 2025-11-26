@@ -26,7 +26,7 @@ export enum OrderStatus {
   RETURNED = "returned",
 }
 
-export enum OrderType {
+export enum OrderEvidenceType {
   SEND_PACKAGE = "send_package",
   RECEIVE_PACKAGE = "receive_package",
   RETURN_PACKAGE = "return_package",

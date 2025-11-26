@@ -16,7 +16,7 @@ export enum PaymentMethod {
   CARD = "card",
 }
 
-export enum OrderType {
+export enum OrderEvidenceType {
   SEND_PACKAGE = "send_package",
   RECEIVE_PACKAGE = "receive_package",
   RETURN_PACKAGE = "return_package",

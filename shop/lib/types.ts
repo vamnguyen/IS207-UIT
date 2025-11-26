@@ -1,6 +1,6 @@
 import {
+  OrderEvidenceType,
   OrderStatus,
-  OrderType,
   PaymentMethod,
   PaymentStatus,
   ProductStatus,
@@ -77,7 +77,7 @@ export interface OrderEvidence {
   order_id: number;
   user_id: number;
   user: User;
-  type: OrderType;
+  type: OrderEvidenceType;
   media_url: string;
   note: string | null;
   created_at: string;
