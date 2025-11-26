@@ -1,9 +1,11 @@
-"use client";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
-
-import { useState } from "react";
-
-export default function FAQPageClient() {
+export default function FAQPage() {
   const faqs = [
     {
       q: "Rerent là gì?",
@@ -39,48 +41,32 @@ export default function FAQPageClient() {
     },
   ];
 
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const toggleAccordion = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-
   return (
-    <div className="min-h-screen bg-white py-16 px-4">
+    <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-5xl font-bold text-center mb-4 text-black">Frequently Asked Questions</h1>
-        <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto">
+        <h1 className="text-5xl font-bold text-center mb-4 text-foreground">
+          Câu hỏi thường gặp
+        </h1>
+        <p className="text-center text-muted-foreground mb-16 max-w-2xl mx-auto">
           Tìm kiếm những câu hỏi thường gặp về sản phẩm và dịch vụ tại Rerent.
         </p>
 
-        <div className="space-y-5">
+        <Accordion type="single" collapsible className="w-full space-y-4">
           {faqs.map((faq, index) => (
-            <div
+            <AccordionItem
               key={index}
-              className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow transition-all duration-200"
+              value={`item-${index}`}
+              className="bg-card border border-border rounded-xl px-6 shadow-sm hover:shadow transition-all duration-200"
             >
-              <button
-                onClick={() => toggleAccordion(index)}
-                className="w-full px-6 py-5 text-left font-semibold text-gray-800 flex justify-between items-center"
-              >
-                <span>{faq.q}</span>
-                <span
-                  className={`transform transition-transform duration-300 text-xl ${
-                    openIndex === index ? "rotate-180" : "rotate-0"
-                  }`}
-                >
-                  ▼
-                </span>
-              </button>
-
-              {openIndex === index && (
-                <div className="px-6 py-5 border-t border-gray-200 text-gray-600 leading-relaxed animate-fadeIn">
-                  {faq.a}
-                </div>
-              )}
-            </div>
+              <AccordionTrigger className="text-lg font-semibold text-foreground hover:no-underline py-5">
+                {faq.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-5">
+                {faq.a}
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
       </div>
     </div>
   );
