@@ -13,6 +13,7 @@ const publicPaths: string[] = [
   "/terms",
   "/privacy",
   "/help",
+  "/auth/callback",
 ];
 
 export function middleware(request: NextRequest) {
