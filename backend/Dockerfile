@@ -10,7 +10,10 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libpq-dev \
     libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql zip bcmath
+    nginx \
+    && docker-php-ext-install pdo pdo_mysql zip bcmath \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /etc/nginx/sites-enabled/default
 
 # 3️⃣ Install Composer globally
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -29,10 +32,13 @@ RUN --mount=type=cache,target=/root/.composer \
 RUN chmod -R 775 storage bootstrap/cache
 
 # 8️⃣ Thiết lập biến môi trường PORT (Render sẽ override)
-ENV PORT=9000
+ENV PORT=80
 
 # 9️⃣ Expose port (chỉ để tham khảo, Render tự map cổng thật)
-EXPOSE 9000
+EXPOSE 80
+
+# Copy Nginx config
+COPY nginx/conf.d/app.conf /etc/nginx/conf.d/default.conf
 
 # 🔟 Set entrypoint to run migrations rồi khởi động server
 RUN chmod +x docker-entrypoint.sh
