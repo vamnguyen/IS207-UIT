@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM php:8.4-cli
+FROM php:8.4-fpm
 
 # 1️⃣ Set working directory
 WORKDIR /var/www/html
@@ -29,10 +29,10 @@ RUN --mount=type=cache,target=/root/.composer \
 RUN chmod -R 775 storage bootstrap/cache
 
 # 8️⃣ Thiết lập biến môi trường PORT (Render sẽ override)
-ENV PORT=8000
+ENV PORT=9000
 
 # 9️⃣ Expose port (chỉ để tham khảo, Render tự map cổng thật)
-EXPOSE 8000
+EXPOSE 9000
 
 # 🔟 Set entrypoint to run migrations rồi khởi động server
 RUN chmod +x docker-entrypoint.sh
