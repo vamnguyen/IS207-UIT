@@ -10,4 +10,7 @@ php artisan view:cache >/dev/null 2>&1 || true
 php artisan migrate --force
 
 echo "Starting PHP-FPM..."
-exec php-fpm
+php-fpm -D
+
+echo "Starting Nginx..."
+nginx -g "daemon off;"
