@@ -115,6 +115,12 @@ export default function ProductsPage() {
         return "secondary";
       case ProductStatus.MAINTENANCE:
         return "destructive";
+      case ProductStatus.SUSPEND:
+        return "destructive";
+      case ProductStatus.DISCONTINUE:
+        return "destructive";
+      case ProductStatus.OUT_OF_STOCK:
+        return "destructive";
       default:
         return "outline";
     }
