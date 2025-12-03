@@ -47,6 +47,7 @@ export const getProductsByCategoryId = async (
       params: {
         page,
         per_page,
+        status: 'Còn hàng', // Lọc chỉ lấy sản phẩm còn hàng
       },
     }
   );
