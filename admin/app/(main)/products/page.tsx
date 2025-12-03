@@ -73,16 +73,15 @@ export default function ProductsPage() {
     },
   });
 
-  // Thêm hàm mutation update status (ngừng kinh doanh)
-  const updateStatusMut = useMutation({
-    mutationFn: (id: number) => updateProductStatus(id),
+  const stopSaleMut = useMutation({
+    mutationFn: (id: number) => stopSaleProduct(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["products"] });
       toast.success("Ngừng kinh doanh sản phẩm thành công");
     },
     onError: () => {
-      toast.error("Không thể ngừng kinh doanh sản phẩm");
-    }
+      toast.error("Có lỗi xảy ra: Không thể ngừng kinh doanh sản phẩm");
+    },
   });
 
   const handleCreate = () => {
