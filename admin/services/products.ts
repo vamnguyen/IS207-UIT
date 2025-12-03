@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import { ProductStatus } from "@/lib/enum";
 import { PaginatedResponse } from "@/lib/response";
 import { Product, ProductFilters } from "@/lib/types";
 
@@ -72,6 +73,16 @@ export const updateProduct = async (id: number, data: Partial<Product>) => {
 export const deleteProduct = async (id: number) => {
   const response = await axiosInstance.delete(
     `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`
+  );
+  return response.data;
+};
+
+export const stopSaleProduct = async (id: number) => {
+  const response = await axiosInstance.put(
+    `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
+    {
+      status: ProductStatus.DISCONTINUE,
+    }
   );
   return response.data;
 };

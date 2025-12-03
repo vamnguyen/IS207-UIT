@@ -67,7 +67,7 @@ export default function CategoryProducts({
               >
                 {product.status === ProductStatus.IN_STOCK
                   ? "Còn hàng"
-                  : "Đang thuê"}
+                  : "Đang cho thuê"}
               </Badge>
 
               {/* Favorite Button */}
