@@ -55,7 +55,7 @@ export default function ProductsPage() {
     paginated && Array.isArray(paginated.data) ? paginated.data : [];
 
   const deleteMut = useMutation({
-    mutationFn: (id: number) => deleteProduct(id),
+    mutationFn: (id: number) => deleteProduct(id),  
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["products"] });
       toast.success("Xóa sản phẩm thành công");
