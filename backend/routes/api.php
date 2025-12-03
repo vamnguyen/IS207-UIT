@@ -65,7 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:shop,admin')->group(function () {
         Route::post('/products', [ProductController::class, 'store']);
         Route::put('/products/{product}', [ProductController::class, 'update']);
-        Route::put('/products/{product}/status', [ProductController::class, 'updateStatus']); // thêm API cập nhật trạng thái Ngừng kinh doanh
+        Route::put('/products/{product}/status', [ProductController::class, 'updateStatus']);
         Route::delete('/products/{product}', [ProductController::class, 'destroy']);
         Route::get('/shops/{shop}/products', [ProductController::class, 'getByShopId']);
 

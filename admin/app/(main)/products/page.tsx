@@ -28,7 +28,11 @@ import { ProductStatus } from "@/lib/enum";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import Image from "next/image";
 import { toast } from "sonner";
-import { getProducts, deleteProduct, updateProductStatus } from "@/services/products";
+import {
+  getProducts,
+  deleteProduct,
+  stopSaleProduct,
+} from "@/services/products";
 import ProductFormDialog from "@/components/products/product-form-dialog";
 
 export default function ProductsPage() {
@@ -51,23 +55,22 @@ export default function ProductsPage() {
     paginated && Array.isArray(paginated.data) ? paginated.data : [];
 
   const deleteMut = useMutation({
-    mutationFn: (id: number) => deleteProduct(id),  
+    mutationFn: (id: number) => deleteProduct(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["products"] });
-      toast.success("Ngừng kinh doanh sản phẩm thành công");
+      toast.success("Xóa sản phẩm thành công");
     },
   });
 
-  // Thêm hàm mutation update status (ngừng kinh doanh)
-  const updateStatusMut = useMutation({
-    mutationFn: (id: number) => updateProductStatus(id),
+  const stopSaleMut = useMutation({
+    mutationFn: (id: number) => stopSaleProduct(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["products"] });
       toast.success("Ngừng kinh doanh sản phẩm thành công");
     },
     onError: () => {
-      toast.error("Không thể ngừng kinh doanh sản phẩm");
-    }
+      toast.error("Có lỗi xảy ra: Không thể ngừng kinh doanh sản phẩm");
+    },
   });
 
   const handleCreate = () => {
@@ -97,10 +100,9 @@ export default function ProductsPage() {
     }
   };
 
-  // Hàm xác nhận ngừng kinh doanh (LONG thêm)
   const confirmDiscontinue = () => {
     if (selectedProduct) {
-      updateStatusMut.mutate(selectedProduct.id);
+      stopSaleMut.mutate(selectedProduct.id);
       setIsDeleteDialogOpen(false);
     }
   };
@@ -308,13 +310,15 @@ export default function ProductsPage() {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="max-w-lg" aria-describedby="delete-product">
           <DialogHeader>
-            <DialogTitle>Xác nhận ngừng kinh doanh</DialogTitle> {/* Confirm Deletion */}
+            <DialogTitle>Xác nhận ngừng kinh doanh</DialogTitle>{" "}
+            {/* Confirm Deletion */}
             <DialogDescription>
               Bạn có chắc chắn muốn <strong>ngừng kinh doanh</strong> sản phẩm{" "}
               <strong>{selectedProduct?.name}</strong>? Hành động này không thể
-              hoàn tác. <br/>
-              <span className="text-amber-600 font-medium">
-                ⚠️ Lưu ý: Sản phẩm sẽ được ẩn khỏi danh mục nhưng vẫn hiển thị trong lịch sử đơn hàng.
+              hoàn tác. <br />
+              <span className="text-destructive font-medium">
+                ⚠️ Lưu ý: Sản phẩm sẽ được ẩn khỏi danh mục nhưng vẫn hiển thị
+                trong lịch sử đơn hàng.
               </span>
             </DialogDescription>
           </DialogHeader>
@@ -327,7 +331,7 @@ export default function ProductsPage() {
               Hủy
             </Button>
             <Button variant="destructive" onClick={confirmDiscontinue}>
-              Ngừng kinh doanh  {/* Thay đổi nội dung button */}
+              Ngừng kinh doanh
             </Button>
           </DialogFooter>
         </DialogContent>
