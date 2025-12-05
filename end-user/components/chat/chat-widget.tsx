@@ -28,6 +28,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { MarkdownRenderer } from "@/components/chat/markdown-renderer";
 import { chatDisplayName, formatConversationDate } from "@/lib/utils-chat";
 import {
   ChatConversation,
@@ -442,9 +443,13 @@ export function ChatWidget() {
                           : "bg-muted text-foreground"
                       )}
                     >
-                      <p className="whitespace-pre-wrap leading-relaxed">
-                        {message.content}
-                      </p>
+                      {isUser ? (
+                        <p className="whitespace-pre-wrap leading-relaxed">
+                          {message.content}
+                        </p>
+                      ) : (
+                        <MarkdownRenderer content={message.content} />
+                      )}
                     </div>
                   </div>
                 );
