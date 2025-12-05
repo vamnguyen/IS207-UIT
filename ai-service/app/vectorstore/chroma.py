@@ -1,4 +1,5 @@
 import chromadb
+from chromadb.utils import embedding_functions
 from typing import Optional
 from functools import lru_cache
 from app.config import get_settings
@@ -14,6 +15,17 @@ class ChromaVectorStore:
         self.settings = get_settings()
         self._client: Optional[chromadb.PersistentClient] = None
         self._collection = None
+        self._embedding_function = None
+    
+    def _get_embedding_function(self):
+        """Get Google Generative AI embedding function (lightweight, API-based)."""
+        if self._embedding_function is None:
+            # Use Google's embedding API instead of local ONNX model
+            self._embedding_function = embedding_functions.GoogleGenerativeAiEmbeddingFunction(
+                api_key=self.settings.google_api_key,
+                model_name="models/embedding-001"
+            )
+        return self._embedding_function
     
     def _get_client(self) -> chromadb.PersistentClient:
         """Get or create ChromaDB persistent client."""
@@ -29,7 +41,8 @@ class ChromaVectorStore:
             client = self._get_client()
             self._collection = client.get_or_create_collection(
                 name=self.COLLECTION_NAME,
-                metadata={"description": "ReRent product embeddings for RAG"}
+                metadata={"description": "ReRent product embeddings for RAG"},
+                embedding_function=self._get_embedding_function()
             )
         return self._collection
     
