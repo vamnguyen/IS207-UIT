@@ -17,6 +17,8 @@ COPY . .
 # Create directory for ChromaDB data
 RUN mkdir -p /app/chroma_data
 
+# Expose port (Render uses PORT env variable)
 EXPOSE 8001
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+# Use PORT from environment (Render requirement)
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8001}

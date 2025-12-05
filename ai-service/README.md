@@ -67,3 +67,54 @@ For production deployment as a separate server:
 1. Use Docker: `docker-compose up -d`
 2. Or deploy to cloud (AWS EC2, GCP, Railway, Fly.io, etc.)
 3. Update Laravel's `AI_SERVICE_URL` to point to production URL
+
+---
+
+## Deploy to Render.com
+
+### Step 1: Push to GitHub
+
+```bash
+git add ai-service/
+git commit -m "Add AI service"
+git push
+```
+
+### Step 2: Create Render Web Service
+
+1. Go to [render.com](https://render.com) → **New** → **Web Service**
+2. Connect your GitHub repo
+3. Set **Root Directory**: `ai-service`
+4. Render will auto-detect `Dockerfile`
+
+### Step 3: Configure Environment Variables
+
+In Render Dashboard → Environment:
+
+| Key                        | Value                      |
+| -------------------------- | -------------------------- |
+| `GOOGLE_API_KEY`           | Your Gemini API key        |
+| `MYSQL_HOST`               | Your production MySQL host |
+| `MYSQL_PORT`               | 3306                       |
+| `MYSQL_DATABASE`           | matcha_db                  |
+| `MYSQL_USER`               | your_user                  |
+| `MYSQL_PASSWORD`           | your_password              |
+| `CHROMA_PERSIST_DIRECTORY` | /app/chroma_data           |
+
+### Step 4: Update Laravel Backend
+
+After deploy, you'll get URL like `https://rerent-ai-service.onrender.com`
+
+Update Laravel `.env`:
+
+```env
+AI_SERVICE_URL=https://rerent-ai-service.onrender.com
+```
+
+### Step 5: Sync Products
+
+```bash
+curl -X POST https://rerent-ai-service.onrender.com/sync
+```
+
+> **Note**: Render free tier will spin down after 15 minutes of inactivity. First request may take ~30s to wake up.
