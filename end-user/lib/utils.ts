@@ -82,6 +82,11 @@ export const statusConfig: Record<
     variant: "destructive",
     icon: XCircle,
   },
+  returned: {
+    label: OrderStatus.RETURNED,
+    variant: "destructive",
+    icon: XCircle,
+  },
 };
 
 export const paymentStatusConfig: Record<

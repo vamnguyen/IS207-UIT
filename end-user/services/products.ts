@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import { ProductStatus } from "@/lib/enum";
 import { PaginatedResponse } from "@/lib/response";
 import { Product, ProductFilters } from "@/lib/types";
 
@@ -47,7 +48,7 @@ export const getProductsByCategoryId = async (
       params: {
         page,
         per_page,
-        status: 'Còn hàng', // Lọc chỉ lấy sản phẩm còn hàng
+        status: ProductStatus.IN_STOCK,
       },
     }
   );

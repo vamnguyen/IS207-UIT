@@ -2,6 +2,9 @@ export enum ProductStatus {
   IN_STOCK = "Còn hàng",
   RENTING = "Đang cho thuê",
   MAINTENANCE = "Bảo trì",
+  SUSPEND = "Tạm ngưng",
+  DISCONTINUE = "Ngừng kinh doanh",
+  OUT_OF_STOCK = "Hết hàng",
 }
 
 export enum Role {

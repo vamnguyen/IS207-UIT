@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
+import { ProductStatus } from "@/lib/enum";
 import { PaginatedResponse } from "@/lib/response";
 import { Product, ProductFilters } from "@/lib/types";
 
@@ -76,14 +77,12 @@ export const deleteProduct = async (id: number) => {
   return response.data;
 };
 
- {/* Hàm cập nhật trạng thái sản phẩm (Ngừng kinh doanh) */}
-export const updateProductStatus = async (id: number) => {
+export const stopSaleProduct = async (id: number) => {
   const response = await axiosInstance.put(
     `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
     {
-      status: 'Ngừng kinh doanh' // Cập nhật trạng thái thành "Ngừng kinh doanh"
-    } 
+      status: ProductStatus.DISCONTINUE,
+    }
   );
   return response.data;
 };
-
