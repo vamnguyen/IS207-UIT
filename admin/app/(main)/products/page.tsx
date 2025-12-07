@@ -84,6 +84,7 @@ export default function ProductsPage() {
     },
   });
 
+
   const handleCreate = () => {
     setSelectedProduct(null);
     setIsFormOpen(true);
