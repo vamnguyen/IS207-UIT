@@ -97,17 +97,6 @@ export default function ProductsPage() {
     }
   };
 
-<<<<<<< HEAD
-  // Hàm xác nhận ngừng kinh doanh (LONG thêm)
-  const confirmDiscontinue = () => {
-    if (selectedProduct) {
-      updateStatusMut.mutate(selectedProduct.id);
-      setIsDeleteDialogOpen(false);
-    }
-  };
-
-=======
->>>>>>> 11e28ff93ceef26aaabca4a1e52e6bffc9a5b323
   const getStatusBadgeVariant = (status: ProductStatus) => {
     switch (status) {
       case ProductStatus.IN_STOCK:
