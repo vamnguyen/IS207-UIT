@@ -107,8 +107,8 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Tổng quan hệ thống</p>
+        <h1 className="text-3xl text-[#1f1f1f] mb-2 font-bold">Dashboard</h1>
+        <p className="text-gray-600">Tổng quan hệ thống</p>
       </div>
 
       {/* Stats Cards */}
@@ -121,10 +121,10 @@ export default function AdminDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl text-[#1f1f1f] mb-2 font-bold">
               {isLoading ? "..." : stats.totalUsers.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-600">
               Tất cả người dùng trong hệ thống
             </p>
           </CardContent>
@@ -136,10 +136,10 @@ export default function AdminDashboard() {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl text-[#1f1f1f] mb-2 font-bold">
               {isLoading ? "..." : stats.totalOrders.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">Đơn hàng đã tạo</p>
+            <p className="text-xs text-gray-600">Đơn hàng đã tạo</p>
           </CardContent>
         </Card>
 
@@ -149,10 +149,10 @@ export default function AdminDashboard() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl text-[#1f1f1f] mb-2 font-bold">
               {isLoading ? "..." : formatCurrency(stats.totalRevenue)}
             </div>
-            <p className="text-xs text-muted-foreground">Tổng doanh thu</p>
+            <p className="text-xs text-gray-600">Tổng doanh thu</p>
           </CardContent>
         </Card>
 
@@ -162,10 +162,10 @@ export default function AdminDashboard() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl text-[#1f1f1f] mb-2 font-bold">
               {isLoading ? "..." : stats.pendingOrders}
             </div>
-            <p className="text-xs text-muted-foreground">Cần xử lý ngay</p>
+            <p className="text-xs text-gray-600">Cần xử lý ngay</p>
           </CardContent>
         </Card>
       </div>
@@ -175,7 +175,7 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Doanh thu theo tháng</CardTitle>
-            <p className="text-sm text-muted-foreground">6 tháng gần nhất</p>
+            <p className="text-sm text-gray-600">6 tháng gần nhất</p>
           </CardHeader>
           <CardContent>
             <ChartContainer
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Đơn hàng theo trạng thái</CardTitle>
-            <p className="text-sm text-muted-foreground">Phân bổ trạng thái</p>
+            <p className="text-sm text-gray-600">Phân bổ trạng thái</p>
           </CardHeader>
           <CardContent>
             <ChartContainer
@@ -280,7 +280,7 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Sản phẩm bán chạy</CardTitle>
-            <p className="text-sm text-muted-foreground">Top 5 sản phẩm</p>
+            <p className="text-sm text-gray-600">Top 5 sản phẩm</p>
           </CardHeader>
           <CardContent>
             <ChartContainer
@@ -334,7 +334,7 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Tăng trưởng người dùng</CardTitle>
-            <p className="text-sm text-muted-foreground">6 tháng gần nhất</p>
+            <p className="text-sm text-gray-600">6 tháng gần nhất</p>
           </CardHeader>
           <CardContent>
             <ChartContainer
