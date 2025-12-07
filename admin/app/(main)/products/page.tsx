@@ -58,17 +58,6 @@ export default function ProductsPage() {
     },
   });
 
-  // Thêm hàm mutation update status (ngừng kinh doanh)
-  const updateStatusMut = useMutation({
-    mutationFn: (id: number) => updateProductStatus(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["products"] });
-      toast.success("Ngừng kinh doanh sản phẩm thành công");
-    },
-    onError: () => {
-      toast.error("Không thể ngừng kinh doanh sản phẩm");
-    }
-  });
 
   const handleCreate = () => {
     setSelectedProduct(null);
@@ -116,12 +105,26 @@ export default function ProductsPage() {
     }
   };
 
+  // Hàm lấy màu badge trạng thái products
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'Còn hàng':
+        return 'bg-[#7aa520] text-white';
+      case 'Hết hàng':
+        return 'bg-red-500 text-white';
+      case 'Sắp về':
+        return 'bg-[#cddd77] text-[#1f1f1f]';
+      default:
+        return 'bg-gray-500 text-white';
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Quản lý sản phẩm</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl text-[#1f1f1f] mb-2 font-bold">Quản lý sản phẩm</h1>
+          <p className="text-gray-600">
             Quản lý tất cả sản phẩm trong hệ thống
           </p>
         </div>
@@ -131,6 +134,27 @@ export default function ProductsPage() {
         </Button>
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-[#e8eabc] p-4">
+          <p className="text-sm text-gray-600 mb-1">Tổng sản phẩm</p>
+          <p className="text-2xl text-[#2c6c24]">142</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-[#e8eabc] p-4">
+          <p className="text-sm text-gray-600 mb-1">Còn hàng</p>
+          <p className="text-2xl text-[#7aa520]">128</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-[#e8eabc] p-4">
+          <p className="text-sm text-gray-600 mb-1">Hết hàng</p>
+          <p className="text-2xl text-red-500">8</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-[#e8eabc] p-4">
+          <p className="text-sm text-gray-600 mb-1">Sắp về</p>
+          <p className="text-2xl text-[#cddd77]">6</p>
+        </div>
+      </div>
+
+      
       <Card>
         <CardHeader>
           <CardTitle>Danh sách sản phẩm</CardTitle>
@@ -153,7 +177,7 @@ export default function ProductsPage() {
             <TableBody>
               {products.map((product) => (
                 <TableRow key={product.id}>
-                  <TableCell className="font-medium">{product.id}</TableCell>
+                  <TableCell className="font-medium text-sm text-[#7aa520]">{product.id}</TableCell>
                   <TableCell>
                     <div className="relative h-12 w-12 overflow-hidden rounded-md border bg-muted">
                       {product.image_url ? (
@@ -171,35 +195,37 @@ export default function ProductsPage() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{formatCurrency(product.price)}</TableCell>
-                  <TableCell>{product.stock}</TableCell>
+                  <TableCell className="text-sm text-[#1f1f1f]">{product.name}</TableCell>
+                  <TableCell className="text-sm text-[#2c6c24]">{formatCurrency(product.price)}</TableCell>
+                  <TableCell className="text-sm text-[#7aa520]">{product.stock}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusBadgeVariant(product.status)}>
-                      {product.status}
-                    </Badge>
+                    
+                      <span className={`inline-block px-3 py-1 rounded-full text-xs ${getStatusBadge(product.status)}`}>
+                        {product.status}
+                      </span>
+                    
                   </TableCell>
-                  <TableCell>{product.category?.name}</TableCell>
-                  <TableCell>{product.shop?.name}</TableCell>
+                  <TableCell className="text-sm text-gray-600">{product.category?.name}</TableCell>
+                  <TableCell className="text-sm text-gray-600">{product.shop?.name}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button
                         variant="ghost"
-                        size="icon"
+                        size="icon" className="text-[#2c6c24]"
                         onClick={() => handleView(product)}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
-                        size="icon"
+                        size="icon" className="text-[#7aa520]"
                         onClick={() => handleEdit(product)}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
-                        size="icon"
+                        size="icon" className="text-red-500"
                         onClick={() => handleDelete(product)}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
