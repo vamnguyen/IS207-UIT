@@ -32,7 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Eye, Pencil, Trash2, Search, Plus } from "lucide-react";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import type { User } from "@/lib/types";
 import { Role } from "@/lib/enum";
 import { formatDate, getInitials } from "@/lib/utils";
@@ -73,8 +73,6 @@ export default function UsersPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editRole, setEditRole] = useState<Role>(Role.CUSTOMER);
-
-  const [searchQuery, setSearchQuery] = useState('');
 
   const handleView = (user: User) => {
     setSelectedUser(user);
@@ -132,51 +130,17 @@ export default function UsersPage() {
     }
   };
 
-  const getRoleBadgeColor = (role: Role) => {
-    switch (role) {
-      case Role.ADMIN:
-        return 'bg-[#2c6c24] text-white';
-      case Role.SHOP:
-        return 'bg-[#7aa520] text-white';
-      case Role.CUSTOMER:
-        return 'bg-[#cddd77] text-[#1f1f1f]';
-      default:
-        return 'bg-[#e8eabc] text-[#1f1f1f]';
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl text-[#1f1f1f] mb-2 font-bold">Quản lý người dùng</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold">Quản lý người dùng</h1>
+          <p className="text-muted-foreground">
             Danh sách tất cả người dùng trong hệ thống
           </p>
         </div>
       </div>
 
-      {/* Actions Bar */}
-      <div className="bg-white rounded-xl shadow-sm border border-[#e8eabc] p-4 mb-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7aa520]" size={20} />
-            <input
-              type="text"
-              placeholder="Tìm kiếm người dùng..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="text-gray-600 w-full pl-10 pr-4 py-2.5 border border-[#e8eabc] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7aa520] focus:border-transparent"
-            />
-          </div>
-          <button className="bg-gradient-to-r from-[#2c6c24] to-[#7aa520] text-white px-6 py-2.5 rounded-lg hover:shadow-lg transition-all duration-200 flex items-center gap-2">
-            <Plus size={20} />
-            Thêm người dùng
-          </button>
-        </div>
-      </div>
-
-      {/* Table */}
       <Card>
         <CardHeader>
           <CardTitle>Danh sách người dùng</CardTitle>
@@ -196,51 +160,44 @@ export default function UsersPage() {
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium text-sm text-[#7aa520]">{user.id}</TableCell>
+                  <TableCell className="font-medium">{user.id}</TableCell>
                   <TableCell>
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#cddd77] to-[#7aa520] flex items-center gap-3">
+                    <div className="flex items-center gap-3">
                       <Avatar>
                         <AvatarImage src={user.avatar_url || undefined} />
                         <AvatarFallback>
                           {getInitials(user.name)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm text-[#1f1f1f]">{user.name}</span>
+                      <span className="font-medium">{user.name}</span>
                     </div>
                   </TableCell>
+                  <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <span className="text-sm text-gray-600">{user.email}</span>
+                    <Badge variant={getRoleBadgeVariant(user.role)}>
+                      {getRoleLabel(user.role)}
+                    </Badge>
                   </TableCell>
-                  <TableCell>
-                    
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs ${getRoleBadgeColor(user.role)}`}>
-                        {getRoleLabel(user.role)}
-                      </span>
-                    
-                  </TableCell>
-                  <TableCell><span className="text-sm text-gray-600">{formatDate(user.created_at)}</span></TableCell>
+                  <TableCell>{formatDate(user.created_at)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button
                         variant="ghost"
-                        size="icon" className="text-[#2c6c24]"
+                        size="icon"
                         onClick={() => handleView(user)}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      
-                          <Button
-                            variant="ghost"
-                            size="icon" className="text-[#7aa520]"
-                            onClick={() => handleEdit(user)}
-                          >
-                        
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      
                       <Button
                         variant="ghost"
-                        size="icon" className="text-red-500"
+                        size="icon"
+                        onClick={() => handleEdit(user)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => handleDelete(user)}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -366,28 +323,6 @@ export default function UsersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Pagination */}
-      <div className="mt-6 flex items-center justify-between">
-        <p className="text-sm text-gray-600">
-          Hiển thị <span className="text-[#2c6c24]">1-8</span> trong tổng số <span className="text-[#2c6c24]">12</span> người dùng
-        </p>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 border border-[#e8eabc] rounded-lg hover:bg-[#e8eabc]/50 transition-colors duration-150">
-            Trước
-          </button>
-          <button className="px-4 py-2 bg-gradient-to-r from-[#2c6c24] to-[#7aa520] text-white rounded-lg">
-            1
-          </button>
-          <button className="px-4 py-2 border border-[#e8eabc] rounded-lg hover:bg-[#e8eabc]/50 transition-colors duration-150">
-            2
-          </button>
-          <button className="px-4 py-2 border border-[#e8eabc] rounded-lg hover:bg-[#e8eabc]/50 transition-colors duration-150">
-            Sau
-          </button>
-        </div>
-      </div>
-
     </div>
   );
 }

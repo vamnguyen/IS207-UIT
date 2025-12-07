@@ -54,24 +54,18 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="bg-[#2c6c24]/20 rounded-lg p-4 mb-3">
         <button className="flex w-full items-center gap-3 rounded-md px-3 py-2 hover:bg-muted focus:outline-none">
           <Avatar className="h-10 w-10">
             <AvatarImage src={user.avatar_url || ""} alt={user.name} />
-             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#cddd77] to-[#7aa520] flex items-center justify-center">
-              <span className="text-[#1f1f1f]">
-                <AvatarFallback>
-                  {user.name?.charAt(0).toUpperCase() ?? "U"}
-                </AvatarFallback>
-              </span>
-             </div>
+            <AvatarFallback>
+              {user.name?.charAt(0).toUpperCase() ?? "U"}
+            </AvatarFallback>
           </Avatar>
           <div className="text-left">
             <p className="text-sm font-medium leading-none">{user.name}</p>
             <p className="text-xs text-muted-foreground">{user.role}</p>
           </div>
         </button>
-        </div>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" className="w-48">
