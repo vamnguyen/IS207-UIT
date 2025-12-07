@@ -11,6 +11,7 @@ export function DetailsOrderClient({ id }: { id: number }) {
     data: order,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["orders", id],
     queryFn: () => getOrderById(id),
@@ -60,5 +61,5 @@ export function DetailsOrderClient({ id }: { id: number }) {
     );
   }
 
-  return <OrderDetail order={order} />;
+  return <OrderDetail order={order} onRefetch={() => refetch()} />;
 }

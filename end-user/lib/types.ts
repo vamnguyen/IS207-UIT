@@ -1,4 +1,5 @@
 import {
+  OrderEvidenceType,
   OrderStatus,
   PaymentMethod,
   PaymentStatus,
@@ -68,6 +69,19 @@ export interface Order {
   updated_at: string;
   items: OrderItem[];
   payment: Payment;
+  evidences: OrderEvidence[];
+}
+
+export interface OrderEvidence {
+  id: number;
+  order_id: number;
+  user_id: number;
+  user: User;
+  type: OrderEvidenceType;
+  media_url: string;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface OrderItem {

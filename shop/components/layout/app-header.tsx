@@ -25,6 +25,10 @@ const navItems = [
     label: "Sản phẩm của tôi",
     href: "/my-products",
   },
+  {
+    label: "Đơn hàng",
+    href: "/orders",
+  },
   { label: "Danh mục", href: "/categories" },
   {
     label: "Giới thiệu",

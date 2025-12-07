@@ -138,7 +138,6 @@ class ProductController extends Controller
 
         // Lấy status từ query param
         $status = $request->query('status');
-        
         $products = Product::with(['category', 'shop'])
             ->where('category_id', $categoryId)
             ->when($status, function ($query) use ($status) {
