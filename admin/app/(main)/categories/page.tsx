@@ -192,8 +192,8 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl text-[#1f1f1f] mb-2 font-bold">Quản lý danh mục</h1>
-          <p className="text-gray-600">Quản lý các danh mục sản phẩm</p>
+          <h1 className="text-3xl font-bold">Quản lý danh mục</h1>
+          <p className="text-muted-foreground">Quản lý các danh mục sản phẩm</p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
@@ -220,7 +220,7 @@ export default function CategoriesPage() {
             <TableBody>
               {categories.map((category) => (
                 <TableRow key={category.id}>
-                  <TableCell className="font-medium text-sm text-[#7aa520]">{category.id}</TableCell>
+                  <TableCell className="font-medium">{category.id}</TableCell>
                   <TableCell>
                     <div className="relative h-12 w-12 overflow-hidden rounded-md border bg-muted">
                       {category.image_url ? (
@@ -237,23 +237,23 @@ export default function CategoriesPage() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-[#1f1f1f]">{category.name}</TableCell>
-                  <TableCell className="text-sm text-[#2c6c24]">
+                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell className="text-muted-foreground">
                     {category.slug}
                   </TableCell>
-                  <TableCell className="text-sm text-[#1f1f1f]">{formatDate(category.created_at)}</TableCell>
+                  <TableCell>{formatDate(category.created_at)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button
                         variant="ghost"
-                        size="icon" className="text-[#7aa520]"
+                        size="icon"
                         onClick={() => handleEdit(category)}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
-                        size="icon" className="text-red-500"
+                        size="icon"
                         onClick={() => handleDelete(category)}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />

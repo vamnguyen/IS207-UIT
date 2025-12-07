@@ -113,31 +113,11 @@ export default function OrdersPage() {
     return true;
   });
 
-  // Hàm lấy màu badge trạng thái orders
-  const getStatusBadgeOrders = (status: OrderStatus) => {
-    switch (status) {
-      case OrderStatus.CONFIRMED:
-        return 'bg-[#7aa520] text-white font-bold';
-      case OrderStatus.PENDING:
-        return 'bg-[#ffec00] text-black font-bold';
-      case OrderStatus.PROCESSING:
-        return 'bg-[#ffec00] text-[#1f1f1f] font-bold';
-      case OrderStatus.SHIPPED:
-        return 'bg-[#7aa520] text-white font-bold';
-      case OrderStatus.DELIVERED:
-        return 'bg-[#7aa520] text-white font-bold';
-      case OrderStatus.CANCELLED:
-        return 'bg-red-500 text-white font-bold';
-      default:
-        return 'bg-gray-500 text-white font-bold';
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl text-[#1f1f1f] mb-2 font-bold">Quản lý đơn hàng</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold">Quản lý đơn hàng</h1>
+        <p className="text-muted-foreground">
           Theo dõi và quản lý tất cả đơn hàng
         </p>
       </div>
@@ -149,7 +129,7 @@ export default function OrdersPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2 text-gray-600 text-sm">
+            <div className="space-y-2">
               <Label htmlFor="status-filter">Trạng thái</Label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger id="status-filter">
@@ -170,7 +150,7 @@ export default function OrdersPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 text-gray-600 text-sm">
+            <div className="space-y-2">
               <Label htmlFor="date-from">Từ ngày</Label>
               <Input
                 id="date-from"
@@ -179,7 +159,7 @@ export default function OrdersPage() {
                 onChange={(e) => setDateFrom(e.target.value)}
               />
             </div>
-            <div className="space-y-2 text-gray-600 text-sm">
+            <div className="space-y-2">
               <Label htmlFor="date-to">Đến ngày</Label>
               <Input
                 id="date-to"
@@ -233,35 +213,31 @@ export default function OrdersPage() {
                           )}
                         </Button>
                       </TableCell>
-                      <TableCell className="font-medium text-sm text-[#7aa520]">#{order.id}</TableCell>
+                      <TableCell className="font-medium">#{order.id}</TableCell>
                       <TableCell>
                         <div>
-                          <div className="text-[#1f1f1f] mb-2 font-bold">{order.user.name}</div>
-                          <div className="text-sm text-gray-600">
+                          <div className="font-medium">{order.user.name}</div>
+                          <div className="text-sm text-muted-foreground">
                             {order.user.email}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="text-sm text-[#1f1f1f]">
+                        <div className="text-sm">
                           <div>{formatDate(order.start_date)}</div>
-                          <div className="text-[#1f1f1f]">
+                          <div className="text-muted-foreground">
                             đến {formatDate(order.end_date)}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="font-bold text-[#1f1f1f]">
+                      <TableCell className="font-semibold">
                         {formatCurrency(order.total_amount)}
                       </TableCell>
                       <TableCell>
-                        
-                          
-                          <span className={`inline-block px-5 py-1 rounded-full text-xs ${getStatusBadgeOrders(order.status)}`}>
-                            <StatusIcon className="mr-1 h-3 w-3" />
-                            {order.status}
-                          </span>
-                        
-                        
+                        <Badge variant={statusConfig[order.status].variant}>
+                          <StatusIcon className="mr-1 h-3 w-3" />
+                          {order.status}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -272,7 +248,7 @@ export default function OrdersPage() {
                           {order.payment.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-[#1f1f1f]">{formatDate(order.created_at)}</TableCell>
+                      <TableCell>{formatDate(order.created_at)}</TableCell>
                       <TableCell onClick={(e) => e.stopPropagation()}>
                         <Select
                           value={order.status}
@@ -280,7 +256,7 @@ export default function OrdersPage() {
                             handleStatusChange(order.id, value as OrderStatus)
                           }
                         >
-                          <SelectTrigger className="w-[140px] text-sm font-medium text-[#1f1f1f]">
+                          <SelectTrigger className="w-[140px]">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
