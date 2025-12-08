@@ -1,0 +1,22 @@
+services:
+  ai-service:
+    build: .
+    container_name: rerent-ai-service
+    ports:
+      - "8001:8001"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - MYSQL_HOST=${MYSQL_HOST:-host.docker.internal}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-matcha_db}
+      - MYSQL_USER=${MYSQL_USER:-matcha_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-matcha_password}
+      - CHROMA_PERSIST_DIRECTORY=/app/chroma_data
+    volumes:
+      - chroma_data:/app/chroma_data
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  chroma_data:

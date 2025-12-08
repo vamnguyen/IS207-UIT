@@ -50,4 +50,15 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL'),
     ],
 
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' => env('FACEBOOK_REDIRECT_URI'),
+    ],
+
+    'ai' => [
+        'url' => env('AI_SERVICE_URL', 'http://localhost:8001'),
+        'timeout' => env('AI_SERVICE_TIMEOUT', 30),
+    ],
+
 ];

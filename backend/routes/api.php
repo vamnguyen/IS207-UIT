@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FacebookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -22,6 +23,8 @@ use App\Http\Controllers\Api\SocialAuthController;
 // 1. Auth & User
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/auth/facebook/redirect', [FacebookController::class, 'redirectToFacebook']);
+Route::get('/auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
 // 2. Category
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
@@ -65,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:shop,admin')->group(function () {
         Route::post('/products', [ProductController::class, 'store']);
         Route::put('/products/{product}', [ProductController::class, 'update']);
+        Route::put('/products/{product}/status', [ProductController::class, 'updateStatus']);
         Route::delete('/products/{product}', [ProductController::class, 'destroy']);
         Route::get('/shops/{shop}/products', [ProductController::class, 'getByShopId']);
 

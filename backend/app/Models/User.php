@@ -28,6 +28,7 @@ class User extends Authenticatable
         'role',
         'provider',
         'provider_id',
+        'facebook_id',
         'avatar',
     ];
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
+import { FacebookLoginButton } from "@/components/auth/facebook-button";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export default function LoginPage() {
           {/* Form đăng nhập email/pass truyền thống */}
           <LoginForm />
 
-          {/* --- PHẦN THÊM VÀO: SOCIAL LOGIN --- */}
+          {/* ---: SOCIAL LOGIN --- */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />

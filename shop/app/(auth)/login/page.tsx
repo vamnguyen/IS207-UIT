@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
 import Link from "next/link";
+import { FacebookLoginButton } from "@/components/auth/facebook-button";
 
 export const metadata: Metadata = {
   title: "Đăng nhập tài khoản",
@@ -17,7 +18,22 @@ export default function LoginPage() {
               Chào mừng bạn quay trở lại với ReRent
             </p>
           </div>
+
           <LoginForm />
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Hoặc tiếp tục với
+              </span>
+            </div>
+          </div>
+
+          <FacebookLoginButton />
+
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
               Chưa có tài khoản?{" "}

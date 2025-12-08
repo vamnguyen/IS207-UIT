@@ -1,4 +1,30 @@
 services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: matcha-backend
+        container_name: matcha-app
+        restart: unless-stopped
+        working_dir: /var/www/html
+        ports:
+            - "8000:80"
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        environment:
+            DB_CONNECTION: mysql
+            DB_HOST: db
+            DB_PORT: 3306
+            DB_DATABASE: matcha_db
+            DB_USERNAME: matcha_user
+            DB_PASSWORD: matcha_password
+            AI_SERVICE_URL: http://host.docker.internal:8001
+            AI_SERVICE_TIMEOUT: 30
+        volumes:
+            - ./:/var/www/html
+        networks:
+            - matcha-network
+
     db:
         container_name: matcha-mysql
         image: mysql:8.0
@@ -12,6 +38,12 @@ services:
         command: --default-authentication-plugin=mysql_native_password
         volumes:
             - mysql_data:/var/lib/mysql
+        networks:
+            - matcha-network
+
+networks:
+    matcha-network:
+        driver: bridge
 
 volumes:
     mysql_data:
