@@ -17,6 +17,8 @@ use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\OrderEvidenceController;
 use App\Http\Controllers\Api\ShopOrderController;
 use App\Http\Controllers\Api\SocialAuthController;
+use App\Http\Controllers\Api\NewPasswordController;
+use App\Http\Controllers\Api\ChangePasswordController;
 
 // ========================== Public routes ==========================
 // 1. Auth & User
@@ -33,6 +35,9 @@ Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('/comments', [CommentController::class, 'index']);
 // 5. Payment
 Route::post('/stripe/webhook', [PaymentController::class, 'webhook']);
+ //Change password
+Route::post('/forgot-password', [NewPasswordController::class, 'forgotPassword']);
+Route::post('/reset-password', [NewPasswordController::class, 'reset']);
 
 
 
@@ -112,4 +117,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // 11. Order Evidences
     Route::get('/orders/{id}/evidences', [OrderEvidenceController::class, 'index']);
     Route::post('/orders/{id}/evidences', [OrderEvidenceController::class, 'store']);
+    // 12. Change Password
+    Route::post('/change-password', [ChangePasswordController::class, 'update']);
+   
 });

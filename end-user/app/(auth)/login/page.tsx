@@ -10,8 +10,7 @@ export default function LoginPage() {
   // Lấy đường dẫn từ env (đang là .../api)
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
   
-  //  Tạo một biến riêng cho Social Login (Cắt bỏ chữ /api đi) ---
-  // Kết quả sẽ ra: http://localhost:8000
+  //  Tạo một biến riêng cho Social Login
   const BASE_URL = API_URL.replace(/\/api\/?$/, ""); 
 
   return (
@@ -26,9 +25,21 @@ export default function LoginPage() {
           </div>
 
           {/* Form đăng nhập email/pass truyền thống */}
-          <LoginForm />
+          <div className="space-y-2">
+            <LoginForm />
+            
+            {/* - QUÊN MẬT KHẨU TẠI ĐÂY*/}
+            <div className="flex justify-end">
+                <Link 
+                    href="/forgot-password" 
+                    className="text-sm font-medium text-primary hover:underline"
+                >
+                    Quên mật khẩu?
+                </Link>
+            </div>
+          </div>
 
-          {/* --- PHẦN THÊM VÀO: SOCIAL LOGIN --- */}
+          {/* --- SOCIAL LOGIN --- */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -41,7 +52,7 @@ export default function LoginPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {/* Nút Google - Dùng BASE_URL (không có /api) */}
+            {/* Nút Google */}
             <a
               href={`${BASE_URL}/auth/google`}
               className="flex items-center justify-center gap-2 px-4 py-2 border rounded-md hover:bg-accent hover:text-accent-foreground transition-colors text-sm font-medium"
@@ -67,7 +78,7 @@ export default function LoginPage() {
               Google
             </a>
 
-            {/* Nút Facebook - Dùng BASE_URL (không có /api) */}
+            {/* Nút Facebook */}
             <a
               href={`${BASE_URL}/auth/facebook`}
               className="flex items-center justify-center gap-2 px-4 py-2 border rounded-md hover:bg-accent hover:text-accent-foreground transition-colors text-sm font-medium"
