@@ -16,6 +16,7 @@ const publicPaths: string[] = [
   "/auth/social-callback",
   "/forgot-password",
   "/reset-password",
+  "/auth/callback",
 ];
 
 export function middleware(request: NextRequest) {

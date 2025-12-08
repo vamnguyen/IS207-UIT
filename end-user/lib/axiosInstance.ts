@@ -7,7 +7,6 @@ const axiosInstance = axios.create({
     "X-Requested-With": "XMLHttpRequest",
   },
   withCredentials: true, // Gửi cookie đi kèm request (bắt buộc cho Sanctum)
-  timeout: 10000, // 10 giây
 });
 
 // Request interceptor để thêm Bearer token vào header

@@ -136,8 +136,14 @@ class ProductController extends Controller
         $perPage = (int) ($request->query('per_page', 10));
         $perPage = max(1, min(100, $perPage));
 
+        // Lấy status từ query param
+        $status = $request->query('status');
+
         $products = Product::with(['category', 'shop'])
             ->where('category_id', $categoryId)
+            ->when($status, function ($query) use ($status) {
+                $query->where('status', $status);
+            }) // Lọc theo status
             ->paginate($perPage);
 
         return response()->json($products);
@@ -202,5 +208,32 @@ class ProductController extends Controller
 
         $product->delete();
         return response()->json(['message' => 'Product deleted successfully']);
+    }
+
+    // Thêm hàm cập nhật trạng thái sản phẩm (Ngừng kinh doanh)
+    public function updateStatus(Request $request, Product $product)
+    {
+        $user = $request->user();
+
+        if ($user->role === 'shop' && $product->shop_id !== $user->id) {
+            return response()->json(['message' => 'Forbidden - not your product'], 403);
+        }
+
+        $request->validate([
+            'status' => 'required|in:
+            Còn hàng,
+            Tạm ngưng,
+            Ngừng kinh doanh,
+            Hết hàng'
+        ]);
+
+        $product->update([
+            'status' => $request->status
+        ]);
+
+        return response()->json([
+            'message' => 'Product status updated successfully',
+            'product' => $product
+        ]);
     }
 }

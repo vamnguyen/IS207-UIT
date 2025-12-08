@@ -7,6 +7,7 @@ use App\Models\Conversation;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\User;
+use App\Services\AIServiceClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -80,6 +81,45 @@ class ChatController extends Controller
                 return;
             }
 
+            // Try AI service first
+            $aiResponse = $this->tryAIService($conversation, $user, $data['message']);
+
+            if ($aiResponse !== null) {
+                $message = $aiResponse['answer'];
+                $metadata = [
+                    'source' => 'ai_service',
+                    'sources' => $aiResponse['sources'] ?? [],
+                    'ai_metadata' => $aiResponse['metadata'] ?? null,
+                ];
+
+                $this->streamEvent([
+                    'event' => 'delta',
+                    'conversation_id' => $conversation->id,
+                    'content' => $message,
+                ]);
+
+                $this->streamEvent([
+                    'event' => 'done',
+                    'conversation_id' => $conversation->id,
+                    'message' => $message,
+                    'metadata' => $metadata,
+                    'usage' => null,
+                ]);
+
+                DB::transaction(function () use ($conversation, $message, $metadata) {
+                    $conversation->messages()->create([
+                        'role' => 'assistant',
+                        'content' => $message,
+                        'metadata' => $metadata,
+                    ]);
+
+                    $conversation->update(['last_message_at' => now()]);
+                });
+
+                return;
+            }
+
+            // Fallback to OpenRouter if AI service fails
             $apiPayload = $this->buildApiPayload($conversation, $user, $data['message']);
 
             try {
@@ -193,6 +233,44 @@ class ChatController extends Controller
             'title' => mb_substr($message, 0, 80),
             'last_message_at' => now(),
         ]);
+    }
+
+    protected function tryAIService(Conversation $conversation, User $user, string $message): ?array
+    {
+        try {
+            $aiService = new AIServiceClient();
+
+            // Check if AI service is available
+            if (! $aiService->isAvailable()) {
+                Log::info('AI Service not available, falling back to OpenRouter');
+                return null;
+            }
+
+            // Build conversation history
+            $history = $conversation->messages()
+                ->latest('id')
+                ->limit(10)
+                ->get()
+                ->sortBy('id')
+                ->values()
+                ->map(fn($msg) => [
+                    'role' => $msg->role,
+                    'content' => $msg->content,
+                ])
+                ->toArray();
+
+            $response = $aiService->ask($message, $user->id, $history);
+
+            if ($response === null) {
+                Log::warning('AI Service returned null response');
+                return null;
+            }
+
+            return $response;
+        } catch (Throwable $e) {
+            Log::error('AI Service error', ['message' => $e->getMessage()]);
+            return null;
+        }
     }
 
     protected function buildApiPayload(Conversation $conversation, User $user, string $latestMessage): array

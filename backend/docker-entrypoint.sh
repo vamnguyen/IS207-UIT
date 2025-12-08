@@ -9,5 +9,8 @@ php artisan view:cache >/dev/null 2>&1 || true
 
 php artisan migrate --force
 
-echo "Starting Laravel on port ${PORT}"
-exec php artisan serve --host=0.0.0.0 --port="${PORT}"
+echo "Starting PHP-FPM..."
+php-fpm -D
+
+echo "Starting Nginx..."
+nginx -g "daemon off;"
