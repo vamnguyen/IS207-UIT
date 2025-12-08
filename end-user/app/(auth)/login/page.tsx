@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
 import { FacebookLoginButton } from "@/components/auth/facebook-button";
+import { GoogleLoginButton } from "@/components/auth/google-button";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -32,7 +33,10 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <FacebookLoginButton />
+          <div className="flex flex-col gap-3">
+            <FacebookLoginButton />
+            <GoogleLoginButton />
+          </div>
 
           <div className="text-center">
             <p className="text-sm text-muted-foreground">

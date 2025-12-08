@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FacebookController;
+use App\Http\Controllers\GoogleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -24,6 +25,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/auth/facebook/redirect', [FacebookController::class, 'redirectToFacebook']);
 Route::get('/auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
+Route::get('/auth/google/redirect', [GoogleController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 // 2. Category
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
