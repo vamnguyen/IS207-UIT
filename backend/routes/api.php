@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\OrderEvidenceController;
 use App\Http\Controllers\Api\ShopOrderController;
+use App\Http\Controllers\Api\SocialAuthController;
 
 // ========================== Public routes ==========================
 // 1. Auth & User
@@ -34,6 +35,7 @@ Route::get('/comments', [CommentController::class, 'index']);
 Route::post('/stripe/webhook', [PaymentController::class, 'webhook']);
 
 
+
 // ========================== Protected routes ==========================
 Route::middleware('auth:sanctum')->group(function () {
     // 1. Auth & User
@@ -41,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    
 
     // 2. Chat Assistant
     Route::post('/chat/assistant', [ChatController::class, 'invoke']);
