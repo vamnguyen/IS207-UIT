@@ -32,7 +32,10 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Chuyển hướng người dùng về trang đăng nhập
       // Dùng if để chắc chắn code này chỉ chạy trên trình duyệt
-      if (typeof window !== "undefined") {
+      if (
+        typeof window !== "undefined" &&
+        window.location.pathname !== "/login"
+      ) {
         window.location.href = "/login";
       }
     }

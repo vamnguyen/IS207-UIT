@@ -15,6 +15,8 @@ export interface User {
   address?: string;
   avatar_url?: string;
   created_at: string;
+  google_id?: string | null;
+  facebook_id?: string | null;
 }
 
 export interface Category {

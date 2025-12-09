@@ -23,6 +23,8 @@ use App\Http\Controllers\Api\ShopOrderController;
 // 1. Auth & User
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [\App\Http\Controllers\Api\PasswordController::class, 'forgotPassword']);
+Route::post('/reset-password', [\App\Http\Controllers\Api\PasswordController::class, 'resetPassword']);
 Route::get('/auth/facebook/redirect', [FacebookController::class, 'redirectToFacebook']);
 Route::get('/auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirectToGoogle']);
@@ -47,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    Route::post('/user/change-password', [\App\Http\Controllers\Api\PasswordController::class, 'changePassword']);
 
     // 2. Chat Assistant
     Route::post('/chat/assistant', [ChatController::class, 'invoke']);

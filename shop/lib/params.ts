@@ -30,3 +30,20 @@ export type updateCommentParams = {
   content: string;
   product_id: number;
 };
+
+export type changePasswordParams = {
+  current_password?: string;
+  password: string;
+  password_confirmation: string;
+};
+
+export type forgotPasswordParams = {
+  email: string;
+};
+
+export type resetPasswordParams = {
+  email: string;
+  token: string;
+  password: string;
+  password_confirmation: string;
+};

@@ -20,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "@/services/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function LoginForm() {
   const router = useRouter();
@@ -107,6 +108,15 @@ export function LoginForm() {
                 </FormItem>
               )}
             />
+
+            <div className="flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Quên mật khẩu?
+              </Link>
+            </div>
 
             <Button
               type="submit"

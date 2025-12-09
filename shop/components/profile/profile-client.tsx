@@ -24,8 +24,11 @@ import Cookies from "js-cookie";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 
+import { ChangePasswordDialog } from "./change-password-dialog";
+
 export function ProfileClient() {
   const [isEditing, setIsEditing] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [editData, setEditData] = useState({
     name: "",
     email: "",
@@ -276,14 +279,20 @@ export function ProfileClient() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Button variant="outline" className="justify-start h-auto p-4">
-              <div className="text-left">
-                <p className="font-medium">Đổi mật khẩu</p>
-                <p className="text-sm text-muted-foreground">
-                  Cập nhật mật khẩu mới
-                </p>
-              </div>
-            </Button>
+            {!user.google_id && !user.facebook_id && (
+              <Button
+                variant="outline"
+                className="justify-start h-auto p-4"
+                onClick={() => setShowChangePassword(true)}
+              >
+                <div className="text-left">
+                  <p className="font-medium">Đổi mật khẩu</p>
+                  <p className="text-sm text-muted-foreground">
+                    Cập nhật mật khẩu mới
+                  </p>
+                </div>
+              </Button>
+            )}
             <Button variant="outline" className="justify-start h-auto p-4">
               <div className="text-left">
                 <p className="font-medium">Cài đặt thông báo</p>
@@ -295,6 +304,13 @@ export function ProfileClient() {
           </div>
         </CardContent>
       </Card>
+      {/* Change Password Dialog */}
+      {!user.google_id && !user.facebook_id && (
+        <ChangePasswordDialog
+          open={showChangePassword}
+          onOpenChange={setShowChangePassword}
+        />
+      )}
     </div>
   );
 }
