@@ -1,80 +1,92 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Play } from "lucide-react";
+import React from "react";
 
 export function HeroSection() {
   return (
-    <section className="relative bg-linear-to-br from-background via-background to-muted/20 py-20 lg:py-32">
-      <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Content */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <h1 className="text-4xl lg:text-6xl font-bold text-balance leading-tight">
-                Thuê đồ dùng
-                <span className="text-primary"> dễ dàng</span>, trả nhanh chóng
-              </h1>
-              <p className="text-xl text-muted-foreground text-pretty max-w-lg">
-                Nền tảng cho thuê đồ dùng hàng đầu Việt Nam. Từ thiết bị điện tử
-                đến đồ gia dụng, tất cả đều có sẵn với giá cả hợp lý.
+    <section className="border-b" style={{ backgroundColor: "#e8eabc" }}>
+      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-16 pt-10 md:flex-row md:items-center">
+        {/* LEFT */}
+        <div className="md:w-1/2">
+          {/* Badge */}
+          <p
+            className="mb-3 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium shadow-sm"
+            style={{
+              backgroundColor: "#cddd77",
+              color: "#2c6c24",
+              border: "1px solid rgba(44,108,36,0.15)",
+            }}
+          >
+            • Hơn 10.000+ đơn thuê mỗi tháng
+          </p>
+
+          {/* Title */}
+          <h1
+            className="mb-4 text-4xl font-bold leading-tight tracking-tight md:text-5xl"
+            style={{ color: "#1f1f1f" }}
+          >
+            Nền tảng giúp bạn{" "}
+            <span style={{ color: "#2c6c24" }}>cho thuê thiết bị sự kiện</span>{" "}
+            dễ dàng
+          </h1>
+
+          <p className="mb-6 text-sm md:text-base" style={{ color: "#374151" }}>
+            Dành cho nhà cung cấp âm thanh, ánh sáng, LED, sân khấu, backdrop…
+            Đăng thiết bị, nhận đơn, quản lý lịch thuê minh bạch – nhanh gọn.
+          </p>
+
+          {/* THAY FORM TÌM KIẾM (Ô TRẮNG) BẰNG CTA CHO NGƯỜI CHO THUÊ */}
+          <div className="mt-6 space-y-4">
+            <div
+              className="rounded-2xl border px-5 py-4"
+              style={{
+                backgroundColor: "#f1f5e8",
+                borderColor: "rgba(44,108,36,0.25)",
+              }}
+            >
+              <p className="text-sm font-medium" style={{ color: "#2c6c24" }}>
+                Bạn đang sở hữu thiết bị sự kiện?
+              </p>
+              <p className="mt-1 text-sm" style={{ color: "#374151" }}>
+                Đăng thiết bị âm thanh/ánh sáng/LED/sân khấu để tiếp cận khách
+                thuê nhanh hơn và tối ưu công suất cho thuê.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/products">
-                <Button size="lg" className="rounded-2xl group">
-                  Thuê ngay
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Button
-                variant="outline"
-                size="lg"
-                className="rounded-2xl bg-transparent"
-              >
-                <Play className="mr-2 h-4 w-4" />
-                Xem demo
-              </Button>
-            </div>
+            <div className="flex flex-col gap-3 sm:flex-row"></div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 pt-8 border-t">
-              <div>
-                <div className="text-2xl font-bold">1000+</div>
-                <div className="text-sm text-muted-foreground">Sản phẩm</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold">5000+</div>
-                <div className="text-sm text-muted-foreground">Khách hàng</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold">99%</div>
-                <div className="text-sm text-muted-foreground">Hài lòng</div>
-              </div>
-            </div>
+            <p className="text-xs" style={{ color: "#6b7280" }}>
+              Hỗ trợ tạo báo giá • Quản lý lịch thuê • Giảm trống lịch thiết bị.
+            </p>
           </div>
+        </div>
 
-          {/* Hero Image */}
-          <div className="relative">
-            <div className="relative rounded-3xl overflow-hidden bg-linear-to-br from-primary/10 to-primary/5 p-8">
-              <img
-                src="https://images.deepai.org/machine-learning-models/d4b1dd3ee43648a997650dc7f9e6923f/panda.jpeg"
-                alt="ReRent Platform"
-                className="w-full h-auto rounded-2xl shadow-2xl"
-              />
+        {/* RIGHT */}
+        <div className="md:w-1/2">
+          <div className="relative overflow-hidden rounded-3xl bg-white shadow-md">
+            <div
+              className="h-64 bg-cover bg-center md:h-72"
+              style={{
+                backgroundImage:
+                  "url('https://images.pexels.com/photos/167491/pexels-photo-167491.jpeg?auto=compress&cs=tinysrgb&w=1400')",
+              }}
+            />
 
-              {/* Floating Cards */}
-              <div className="absolute top-4 right-4 bg-background/95 backdrop-blur rounded-2xl p-4 shadow-lg">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Còn hàng</span>
-                </div>
-              </div>
+            <div className="space-y-2 px-5 py-4">
+              <p className="text-xs font-semibold" style={{ color: "#2c6c24" }}>
+                Dành cho nhà cung cấp
+              </p>
+              <p className="text-sm font-semibold" style={{ color: "#111827" }}>
+                Nhận đơn thuê âm thanh & ánh sáng cho sự kiện
+              </p>
+              <p className="text-xs" style={{ color: "#6b7280" }}>
+                Lịch rõ ràng • Báo giá nhanh • Theo dõi trạng thái đơn thuê
+              </p>
+            </div>
 
-              <div className="absolute bottom-4 left-4 bg-background/95 backdrop-blur rounded-2xl p-4 shadow-lg">
-                <div className="text-sm text-muted-foreground">Giá từ</div>
-                <div className="text-lg font-bold">30.000đ/ngày</div>
-              </div>
+            <div
+              className="absolute right-4 top-4 rounded-full px-3 py-1 text-xs font-medium shadow"
+              style={{ backgroundColor: "#ffffffcc", color: "#2c6c24" }}
+            >
+              Được nhiều nhà cung cấp tin dùng
             </div>
           </div>
         </div>
@@ -82,3 +94,5 @@ export function HeroSection() {
     </section>
   );
 }
+
+export default HeroSection;
