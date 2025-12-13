@@ -77,6 +77,13 @@ Lịch sử hội thoại:
         if stock_match and stock_match.group(1):
             return "check_stock", {"product_id": int(stock_match.group(1))}
         
+        # Check for price-based queries (most expensive, cheapest)
+        if any(kw in query_lower for kw in ["đắt nhất", "cao nhất", "giá cao", "mắc nhất", "most expensive"]):
+            return "most_expensive", {}
+        
+        if any(kw in query_lower for kw in ["rẻ nhất", "thấp nhất", "giá thấp", "giá rẻ", "cheapest"]):
+            return "cheapest", {}
+        
         # Default: product search/consultation
         return "product_search", {}
     
@@ -155,6 +162,35 @@ Lịch sử hội thoại:
             f"- Trạng thái: {product['status']}"
         )
     
+    def _build_price_query_context(self, order: str = "DESC", limit: int = 5) -> tuple[str, list[dict]]:
+        """Build context for price-based queries (most expensive or cheapest)."""
+        mysql_client = get_mysql_client()
+        products = mysql_client.get_products_by_price(order=order, limit=limit)
+        
+        if not products:
+            return "Không tìm thấy sản phẩm nào trong hệ thống.", []
+        
+        label = "đắt nhất" if order == "DESC" else "rẻ nhất"
+        context_parts = [f"Top {limit} sản phẩm có giá {label}:"]
+        sources = []
+        
+        for i, product in enumerate(products, 1):
+            price = float(product['price']) if product['price'] else 0
+            context_parts.append(
+                f"{i}. {product['name']} - {self._format_price(price)} | "
+                f"Danh mục: {product.get('category_name', 'N/A')} | "
+                f"Còn: {product['stock']} sản phẩm"
+            )
+            sources.append({
+                "product_id": product["id"],
+                "name": product["name"],
+                "price": price,
+                "stock": product["stock"],
+                "category": product.get("category_name", "N/A")
+            })
+        
+        return "\n".join(context_parts), sources
+    
     def _build_product_search_context(self, query: str) -> tuple[str, list[dict]]:
         """Build context for product search using vector similarity."""
         vectorstore = get_vectorstore()
@@ -196,6 +232,10 @@ Lịch sử hội thoại:
             context = self._build_best_sellers_context()
         elif intent == "check_stock":
             context = self._build_stock_context(intent_data["product_id"])
+        elif intent == "most_expensive":
+            context, sources = self._build_price_query_context(order="DESC")
+        elif intent == "cheapest":
+            context, sources = self._build_price_query_context(order="ASC")
         else:
             context, sources = self._build_product_search_context(query)
         

@@ -185,6 +185,28 @@ class MySQLClient:
             """, (search_pattern, search_pattern, limit))
             return cursor.fetchall()
     
+    def get_products_by_price(self, order: str = "DESC", limit: int = 5) -> list[dict]:
+        """Get products ordered by price (most expensive or cheapest)."""
+        conn = self._get_connection()
+        with conn.cursor() as cursor:
+            # Validate order parameter to prevent SQL injection
+            order = "DESC" if order.upper() == "DESC" else "ASC"
+            cursor.execute(f"""
+                SELECT 
+                    p.id,
+                    p.name,
+                    p.description,
+                    p.price,
+                    p.stock,
+                    c.name as category_name
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.status = 'Còn hàng'
+                ORDER BY CAST(p.price AS DECIMAL(15,2)) {order}
+                LIMIT %s
+            """, (limit,))
+            return cursor.fetchall()
+    
     def close(self):
         """Close database connection."""
         if self._connection and self._connection.open:
