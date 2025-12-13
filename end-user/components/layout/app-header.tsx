@@ -24,10 +24,14 @@ import Logo from "@/public/logo.png";
 
 const navItems = [
   {
+    label: "Kênh bán hàng",
+    href: "https://rerent-shop.vercel.app",
+    external: true,
+  },
+  {
     label: "Sản phẩm",
     href: "/products",
   },
-
   {
     label: "Danh mục",
     href: "/categories",
@@ -92,6 +96,8 @@ export function AppHeader() {
               <Link
                 key={item.href}
                 href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
                 className="text-sm font-medium hover:text-primary transition-colors"
               >
                 {item.label}
@@ -188,6 +194,8 @@ export function AppHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noopener noreferrer" : undefined}
                   className="text-sm font-medium hover:text-primary transition-colors"
                 >
                   {item.label}

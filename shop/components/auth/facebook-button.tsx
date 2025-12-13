@@ -9,9 +9,9 @@ export function FacebookLoginButton() {
   };
 
   return (
-    <Button variant="outline" className="w-full" onClick={handleLogin}>
+    <Button variant="outline" className="flex-1 h-11" onClick={handleLogin}>
       <Facebook className="mr-2 h-4 w-4" />
-      Đăng nhập với Facebook
+      Facebook
     </Button>
   );
 }
