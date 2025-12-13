@@ -11,6 +11,7 @@ from app.schemas import (
 from app.database import get_mysql_client
 from app.vectorstore import get_vectorstore
 from app.agents import get_chat_agent
+from app.agents.smart_agent import get_smart_agent
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -90,11 +91,20 @@ async def sync_products():
 
 @app.post("/ask", response_model=ChatResponse)
 async def ask(request: ChatRequest):
-    """Chat with AI about products and orders."""
+    """
+    Chat with AI about products and orders.
+    
+    Set use_smart_agent=True (default) for Text-to-SQL approach (more flexible).
+    Set use_smart_agent=False for rule-based intent detection (faster but limited).
+    """
     try:
-        chat_agent = get_chat_agent()
+        # Choose agent based on request
+        if request.use_smart_agent:
+            agent = get_smart_agent()
+        else:
+            agent = get_chat_agent()
         
-        result = chat_agent.chat(
+        result = agent.chat(
             query=request.query,
             user_id=request.user_id,
             conversation_history=request.conversation_history

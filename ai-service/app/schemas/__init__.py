@@ -7,6 +7,7 @@ class ChatRequest(BaseModel):
     query: str
     user_id: Optional[int] = None
     conversation_history: Optional[list[dict]] = None
+    use_smart_agent: bool = True  # Use Text-to-SQL agent by default
 
 
 class ProductSource(BaseModel):
