@@ -1,7 +1,7 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { ProductStatus } from "@/lib/enum";
 import { PaginatedResponse } from "@/lib/response";
-import { Product, ProductFilters } from "@/lib/types";
+import { Product, ProductFilters, ProductPriceHistory } from "@/lib/types";
 
 export const getProducts = async (
   page: number = 1,
@@ -82,6 +82,20 @@ export const stopSaleProduct = async (id: number) => {
     `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
     {
       status: ProductStatus.DISCONTINUE,
+    }
+  );
+  return response.data;
+};
+
+export const getProductPriceHistory = async (
+  productId: number,
+  page: number = 1,
+  per_page: number = 20
+): Promise<PaginatedResponse<ProductPriceHistory>> => {
+  const response = await axiosInstance.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/products/${productId}/price-history`,
+    {
+      params: { page, per_page },
     }
   );
   return response.data;

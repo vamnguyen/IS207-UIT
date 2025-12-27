@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductPriceHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -190,9 +191,24 @@ class ProductController extends Controller
             $data['slug'] = Str::slug($request->name);
         }
 
+        // Kiểm tra nếu giá thay đổi thì ghi vào lịch sử
+        $oldPrice = $product->price;
+        $newPrice = $request->has('price') ? (float) $request->price : $oldPrice;
+
+        if ($request->has('price') && abs($oldPrice - $newPrice) > 0.01) {
+            ProductPriceHistory::create([
+                'product_id' => $product->id,
+                'old_price' => $oldPrice,
+                'new_price' => $newPrice,
+                'changed_by' => $user->id,
+                'reason' => $request->price_change_reason ?? null,
+                'effective_date' => now(),
+            ]);
+        }
+
         $product->update($data);
 
-        return response()->json($product);
+        return response()->json($product->load('latestPriceChange'));
     }
 
     /**
@@ -235,5 +251,27 @@ class ProductController extends Controller
             'message' => 'Product status updated successfully',
             'product' => $product
         ]);
+    }
+
+    /**
+     * Lấy lịch sử thay đổi giá của sản phẩm
+     */
+    public function getPriceHistory(Request $request, Product $product)
+    {
+        $user = $request->user();
+
+        // Shop chỉ xem được lịch sử giá của sản phẩm của mình
+        if ($user->role === 'shop' && $product->shop_id !== $user->id) {
+            return response()->json(['message' => 'Forbidden - not your product'], 403);
+        }
+
+        $perPage = (int) ($request->query('per_page', 20));
+        $perPage = max(1, min(100, $perPage));
+
+        $history = $product->priceHistories()
+            ->with('changedByUser:id,name,email')
+            ->paginate($perPage);
+
+        return response()->json($history);
     }
 }

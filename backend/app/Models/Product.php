@@ -38,4 +38,16 @@ class Product extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // Lịch sử thay đổi giá của sản phẩm
+    public function priceHistories()
+    {
+        return $this->hasMany(ProductPriceHistory::class)->orderBy('created_at', 'desc');
+    }
+
+    // Lần thay đổi giá gần nhất
+    public function latestPriceChange()
+    {
+        return $this->hasOne(ProductPriceHistory::class)->latestOfMany();
+    }
 }

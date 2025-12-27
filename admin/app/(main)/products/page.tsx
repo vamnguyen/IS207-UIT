@@ -34,6 +34,7 @@ import {
   stopSaleProduct,
 } from "@/services/products";
 import ProductFormDialog from "@/components/products/product-form-dialog";
+import PriceHistoryList from "@/components/products/price-history-list";
 
 export default function ProductsPage() {
   const qc = useQueryClient();
@@ -225,7 +226,10 @@ export default function ProductsPage() {
 
       {/* View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl" aria-describedby="view-product">
+        <DialogContent
+          className="max-w-3xl max-h-[85vh] overflow-y-auto"
+          aria-describedby="view-product"
+        >
           <DialogHeader>
             <DialogTitle>Chi tiết sản phẩm</DialogTitle>
           </DialogHeader>
@@ -299,6 +303,11 @@ export default function ProductsPage() {
                     {formatDate(selectedProduct.updated_at)}
                   </p>
                 </div>
+              </div>
+
+              {/* Lịch sử thay đổi giá */}
+              <div className="pt-4 border-t">
+                <PriceHistoryList productId={selectedProduct.id} />
               </div>
             </div>
           )}

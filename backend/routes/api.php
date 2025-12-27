@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/products/{product}', [ProductController::class, 'update']);
         Route::put('/products/{product}/status', [ProductController::class, 'updateStatus']);
         Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+        Route::get('/products/{product}/price-history', [ProductController::class, 'getPriceHistory']);
         Route::get('/shops/{shop}/products', [ProductController::class, 'getByShopId']);
 
         // Shop Orders

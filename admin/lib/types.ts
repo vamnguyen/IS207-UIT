@@ -41,6 +41,20 @@ export interface Product {
   shop?: User;
   created_at: string;
   updated_at: string;
+  latest_price_change?: ProductPriceHistory;
+}
+
+export interface ProductPriceHistory {
+  id: number;
+  product_id: number;
+  old_price: string;
+  new_price: string;
+  changed_by: number | null;
+  changed_by_user?: User;
+  reason: string | null;
+  effective_date: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CartItem {
