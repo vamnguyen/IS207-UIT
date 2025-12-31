@@ -11,6 +11,8 @@
 
 A C2C E-commerce platform for renting items, built with a modern tech stack focusing on AI integration and Microservices architecture.
 
+**🔗 Repository**: [https://github.com/vamnguyen/IS207-UIT](https://github.com/vamnguyen/IS207-UIT)
+
 **Key Features:**
 
 - **User Platform**: Search, rent, and list items.
